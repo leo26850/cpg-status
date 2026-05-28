@@ -285,7 +285,7 @@ async function main(): Promise<void> {
   const markdown = renderMonthlyMarkdown(report, currentMonth);
   const mdPath = process.env.KAMG_OPS_PATH
     ? `${process.env.KAMG_OPS_PATH}/clients/cpg-affiliate/reports/${currentMonth}-metrics.md`
-    : `reports/local-${currentMonth}-metrics.md`;
+    : `reports/${currentMonth}-metrics.md`;
   if (!process.env.KAMG_OPS_PATH) mkdirSync('reports', { recursive: true });
   writeFileSync(mdPath, markdown);
   console.log(`Wrote markdown: ${mdPath}`);
