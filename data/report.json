@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T03:18:52.211Z",
+  "generated_at": "2026-05-28T03:38:46.314Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-28"
@@ -89,8 +89,8 @@
       "source": "bison_cold",
       "leads": 77,
       "mql": 27,
-      "sql": 0,
-      "closed_won": 0
+      "sql": 11,
+      "closed_won": 3
     },
     {
       "source": "other",
@@ -127,6 +127,407 @@
       "insufficient_data": true
     }
   ],
-  "lead_log": [],
+  "lead_log": [
+    {
+      "created_at": "2026-05-27T22:25:57.621000000Z",
+      "email_hash": "7b9f84b3-llin",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Gone Cold"
+    },
+    {
+      "created_at": "2026-05-27T14:00:02.270000000Z",
+      "email_hash": "88a67303-nell",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-26T21:44:50.533000000Z",
+      "email_hash": "b512a0ba-.jit",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-26T21:21:51.614000000Z",
+      "email_hash": "017af642-bea",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-22T20:12:36.000000000Z",
+      "email_hash": "14830a15-elle",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
+    },
+    {
+      "created_at": "2026-05-22T18:27:31.514000000Z",
+      "email_hash": "56b8f638-team",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-22T15:26:41.313000000Z",
+      "email_hash": "d0872424-wski",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-22T10:58:56.177000000Z",
+      "email_hash": "f4ecea4b-acky",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-22T01:26:33.532000000Z",
+      "email_hash": "1553671c-abhi",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-21T15:45:18.418000000Z",
+      "email_hash": "d27480b9-eric",
+      "source": "other",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-20T21:56:49.134000000Z",
+      "email_hash": "0139e298-dawn",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-20T20:46:27.802000000Z",
+      "email_hash": "b6180fff-nise",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-20T19:42:26.561000000Z",
+      "email_hash": "36cf6cac-ajia",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Discovery Call Done"
+    },
+    {
+      "created_at": "2026-05-20T06:48:02.287000000Z",
+      "email_hash": "c97be7dc-udev",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-19T16:22:22.660000000Z",
+      "email_hash": "d370f156-ermo",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Closed Won"
+    },
+    {
+      "created_at": "2026-05-19T15:43:35.804000000Z",
+      "email_hash": "90539812-aron",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-19T00:39:28.543000000Z",
+      "email_hash": "1b019115-viad",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
+    },
+    {
+      "created_at": "2026-05-19T00:39:20.425000000Z",
+      "email_hash": "367b0f87-hase",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-19T00:39:16.723000000Z",
+      "email_hash": "250b1933-ylor",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
+    },
+    {
+      "created_at": "2026-05-19T00:39:12.215000000Z",
+      "email_hash": "f2134292-ward",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-18T19:08:45.951000000Z",
+      "email_hash": "2dcc3cd4-erra",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-18T15:46:55.658000000Z",
+      "email_hash": "9e0c8712-5421",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
+    },
+    {
+      "created_at": "2026-05-17T16:55:43.501000000Z",
+      "email_hash": "f348bbf5-nnah",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-16T04:02:03.060000000Z",
+      "email_hash": "27546ad7-zach",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-12T19:50:43.501000000Z",
+      "email_hash": "c0ead8f1-hron",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-12T19:24:39.995000000Z",
+      "email_hash": "ab5508ce-emi",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-12T19:02:11.714000000Z",
+      "email_hash": "87aa74f4-kate",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Closed Lost"
+    },
+    {
+      "created_at": "2026-05-12T18:38:22.213000000Z",
+      "email_hash": "71748e0d-andy",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-12T18:37:44.564000000Z",
+      "email_hash": "260f8293-fice",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-12T18:37:39.384000000Z",
+      "email_hash": "1362d185-dney",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-12T18:37:32.741000000Z",
+      "email_hash": "8c870ff7-aren",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-12T18:37:28.711000000Z",
+      "email_hash": "87f45d09-jeff",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "New"
+    },
+    {
+      "created_at": "2026-05-12T15:46:08.498000000Z",
+      "email_hash": "82f73ec7-rob",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-08T19:51:27.314000000Z",
+      "email_hash": "38bf7f28-ason",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-08T18:56:20.304000000Z",
+      "email_hash": "f6c0ec03-ty",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-08T01:01:40.251000000Z",
+      "email_hash": "c981d404-rtha",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-08T00:00:48.814000000Z",
+      "email_hash": "4a4783a1-dsey",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-07T20:32:11.639000000Z",
+      "email_hash": "1e0ac8a9-ivy",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-07T16:59:32.084000000Z",
+      "email_hash": "4df396f2-ryan",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-06T16:01:05.120000000Z",
+      "email_hash": "00c78c21-onio",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Disqualified"
+    },
+    {
+      "created_at": "2026-05-06T15:30:22.518000000Z",
+      "email_hash": "1e84da21-mrmn",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-06T02:56:45.245000000Z",
+      "email_hash": "5cb62313-mour",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Booked Call"
+    },
+    {
+      "created_at": "2026-05-05T19:20:52.368000000Z",
+      "email_hash": "c5455df6-each",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
+    },
+    {
+      "created_at": "2026-05-05T18:52:00.145000000Z",
+      "email_hash": "bb5d8a6a-mike",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Call Scheduled"
+    },
+    {
+      "created_at": "2026-05-05T18:30:16.912000000Z",
+      "email_hash": "282b3c79-tai",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-05T15:24:51.655000000Z",
+      "email_hash": "aee0faa8-jhai",
+      "source": "bison_cold",
+      "is_mql": true,
+      "is_sql": false,
+      "current_stage": "Following Up"
+    },
+    {
+      "created_at": "2026-05-05T14:49:19.757000000Z",
+      "email_hash": "383de5ae-otte",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-05T12:22:38.237000000Z",
+      "email_hash": "3e63bf2b-hewm",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-04T05:49:27.232000000Z",
+      "email_hash": "85b17372-alex",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-03T19:26:27.136000000Z",
+      "email_hash": "38bc5fba-lena",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    }
+  ],
   "stale": false
 }
