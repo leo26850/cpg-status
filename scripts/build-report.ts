@@ -236,7 +236,12 @@ async function main(): Promise<void> {
   writeFileSync('data/report.json', JSON.stringify(report, null, 2));
   const monthSnap = `data/${today.slice(0, 7)}.json`;
   writeFileSync(monthSnap, JSON.stringify(report, null, 2));
-  console.log(`\nWrote data/report.json and ${monthSnap}`);
+
+  // Render HTML
+  const { renderHtml } = await import('./render/html.js');
+  const html = renderHtml(report);
+  writeFileSync('index.html', html);
+  console.log(`Wrote data/report.json, ${monthSnap}, and index.html`);
   console.log(`Leads: ${attioLeadsRaw.length} raw (deduped ${dedupLeadsArr.length}) | Deals: ${attioDealsRaw.length} | MQL: ${mql} | SQL: ${sql} | Closed Won: ${closed_won}`);
   console.log(`LP submissions: ${lpSubmissions.length} | Vendor spend rows: ${vendorSpend.length}`);
 }

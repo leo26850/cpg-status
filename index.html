@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPG Affiliate — Lead Funnel</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<section class="band-dark">
+  <div class="container">
+    <span class="section-num">CPG Affiliate</span>
+    <h1>Lead Funnel Report</h1>
+    <p class="lede">Window: 2026-05-11 → 2026-05-28 · Generated 2026-05-28</p>
+  </div>
+</section>
+
+<section><div class="container">
+    <span class="section-num">02 · Headline</span>
+    <h2>Current month at a glance</h2>
+    <div class="metric-grid">
+      <div class="stat"><div class="stat-num">78</div><div class="stat-label">Total Leads</div></div>
+      <div class="stat"><div class="stat-num">28</div><div class="stat-label">MQL</div></div>
+      <div class="stat"><div class="stat-num">71</div><div class="stat-label">SQL</div></div>
+      <div class="stat"><div class="stat-num">41</div><div class="stat-label">Closed Won</div></div>
+      <div class="stat"><div class="stat-num">$175</div><div class="stat-label">CPL</div></div>
+      <div class="stat"><div class="stat-num">—</div><div class="stat-label">CPA</div></div>
+    </div>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">03 · Spend & CPL</span>
+    <h2>Spend, leads, cost per lead</h2>
+    <table>
+      <thead><tr><th>Month</th><th>Spend (gads)</th><th>Spend (bison)</th><th>Total Spend</th><th>Leads</th><th>CPL</th></tr></thead>
+      <tbody>
+    <tr>
+      <td>2026-04</td>
+      <td>$0</td>
+      <td>$4,000</td>
+      <td>$4,000</td>
+      <td>21</td>
+      <td>$190</td>
+    </tr>
+    <tr>
+      <td>2026-05</td>
+      <td>$5,000</td>
+      <td>$5,000</td>
+      <td>$10,000</td>
+      <td>57</td>
+      <td>$175</td>
+    </tr></tbody>
+    </table>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">04 · Source mix</span>
+    <h2>Inbound leads by source</h2>
+    <div class="card"><canvas id="chart-by-source" height="100"></canvas></div>
+    <table style="margin-top: 24px;">
+      <thead><tr><th>Month</th><th>gads_lp</th><th>bison_cold</th><th>Total</th></tr></thead>
+      <tbody>
+    <tr>
+      <td>2026-04</td>
+      <td>0</td>
+      <td>21</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <td>2026-05</td>
+      <td>0</td>
+      <td>56</td>
+      <td>57</td>
+    </tr></tbody>
+    </table>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">05 · MQL</span>
+    <h2>Marketing-qualified leads (Booked Call)</h2>
+    <div class="grid-2">
+      <div class="card"><canvas id="chart-funnel" height="180"></canvas></div>
+      <div class="card"><canvas id="chart-mql-by-source" height="180"></canvas></div>
+    </div>
+    <table style="margin-top: 24px;">
+      <thead><tr><th>Month</th><th>MQL (gads)</th><th>MQL (bison)</th><th>MQL Rate</th><th>CPL → MQL</th></tr></thead>
+      <tbody>
+    <tr>
+      <td>2026-04</td>
+      <td>0</td>
+      <td>7</td>
+      <td>33.3%</td>
+      <td>$571</td>
+    </tr>
+    <tr>
+      <td>2026-05</td>
+      <td>0</td>
+      <td>20</td>
+      <td>36.8%</td>
+      <td>$476</td>
+    </tr></tbody>
+    </table>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">06 · SQL</span>
+    <h2>Sales-qualified deals (Proposal Sent · Negotiating · Closed Won)</h2>
+    <div class="grid-2">
+      <div class="card"><canvas id="chart-sql-donut" height="180"></canvas></div>
+      <div class="card">
+        <h3>Current month split</h3>
+        <p><span class="tag">Proposal Sent</span> 10</p>
+        <p><span class="tag tag-blue">Negotiating</span> 20</p>
+        <p><span class="tag tag-green">Closed Won</span> 41</p>
+      </div>
+    </div>
+    <table style="margin-top: 24px;">
+      <thead><tr><th>Month</th><th>Proposal Sent</th><th>Negotiating</th><th>Closed Won</th><th>SQL Rate</th></tr></thead>
+      <tbody>
+    <tr>
+      <td>2026-04</td>
+      <td>2</td>
+      <td>20</td>
+      <td>38</td>
+      <td>857.1%</td>
+    </tr>
+    <tr>
+      <td>2026-05</td>
+      <td>8</td>
+      <td>0</td>
+      <td>3</td>
+      <td>52.4%</td>
+    </tr></tbody>
+    </table>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">07 · Cohort CPA</span>
+    <h2>Deals closed — N+90 cohort</h2>
+    <div class="callout callout-info"><strong>Insufficient data</strong> — N+90 cohort CPA requires 90 days post-launch. Launch: 2026-05-11. Available: 2026-05.</div>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">08 · CPA & Payback</span>
+    <h2>CPA by source + payback</h2>
+    <div class="card"><canvas id="chart-cohort-line" height="100"></canvas></div>
+    <p style="margin-top: 16px;">Payback calculation requires gross-margin input from the client. Awaiting target.</p>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">09 · Lead log</span>
+    <h2>Recent leads (last 50)</h2>
+    <table>
+      <thead><tr><th>Created</th><th>Email</th><th>Source</th><th>MQL?</th><th>SQL?</th><th>Stage</th></tr></thead>
+      <tbody><tr><td colspan="6" style="text-align: center; color: #999;">No leads in window</td></tr></tbody>
+    </table>
+  </div></section>
+<section><div class="container">
+    <span class="section-num">10 · Definitions</span>
+    <h2>How these metrics are defined</h2>
+    <div class="grid-2">
+      <div class="card"><h4>MQL</h4><p>Lead has reached Attio Leads stage <code>Booked Call</code>. CPG-specific override of the SOP-generic Fit+Intent ≥ 60.</p></div>
+      <div class="card"><h4>SQL</h4><p>Deal has reached <code>Proposal Sent</code>, <code>Negotiating</code>, or <code>Closed Won</code>. CPG-specific override of the SOP-generic BANT-lite.</p></div>
+      <div class="card"><h4>CPL</h4><p>Fully-loaded monthly spend ÷ deduped, junk-excluded leads. First-touch attribution.</p></div>
+      <div class="card"><h4>CPA</h4><p>Cohort-based: N−3 month spend ÷ Closed Won deals from the cohort by month N+90.</p></div>
+    </div>
+    <p style="margin-top: 24px; font-size: 0.85em; color: var(--muted);">Full rubric: <code>kamg-ops/clients/cpg-affiliate/metrics-rubric.md</code></p>
+  </div></section>
+
+<footer><div class="container">Generated by <code>cpg-status</code> · 2026-05-28T03:18:52.211Z</div></footer>
+
+<script id="report-data" type="application/json">{"generated_at":"2026-05-28T03:18:52.211Z","window":{"start":"2026-05-11","end":"2026-05-28"},"launch_date":"2026-05-11","kpis":{"total_leads":78,"mql":28,"sql":71,"closed_won":41,"cpl":175.43859649122808,"cpa":null},"monthly":[{"month":"2026-04","total_leads":21,"leads_by_source":{"gads_lp":0,"bison_cold":21,"other":0},"mql":7,"mql_by_source":{"gads_lp":0,"bison_cold":7,"other":0},"sql":60,"sql_stage_split":{"proposal_sent":2,"negotiating":20,"closed_won":38},"spend_total":4000,"spend_by_source":{"gads_lp":0,"bison_cold":4000,"other":0},"cpl":190.47619047619048,"cpl_to_mql":571.4285714285714,"mql_rate":0.3333333333333333,"sql_rate":8.571428571428571},{"month":"2026-05","total_leads":57,"leads_by_source":{"gads_lp":0,"bison_cold":56,"other":1},"mql":21,"mql_by_source":{"gads_lp":0,"bison_cold":20,"other":1},"sql":11,"sql_stage_split":{"proposal_sent":8,"negotiating":0,"closed_won":3},"spend_total":10000,"spend_by_source":{"gads_lp":5000,"bison_cold":5000,"other":0},"cpl":175.43859649122808,"cpl_to_mql":476.1904761904762,"mql_rate":0.3684210526315789,"sql_rate":0.5238095238095238}],"by_source":[{"source":"gads_lp","leads":0,"mql":0,"sql":0,"closed_won":0},{"source":"bison_cold","leads":77,"mql":27,"sql":0,"closed_won":0},{"source":"other","leads":1,"mql":1,"sql":0,"closed_won":0}],"funnel":{"leads":78,"mql":28,"sql":71,"closed_won":41},"sql_stage_split":{"proposal_sent":10,"negotiating":20,"closed_won":41},"cohort_cpa":[{"cohort_month":"2026-04","spend_n_minus_3":null,"wins":38,"cpa":null,"insufficient_data":true},{"cohort_month":"2026-05","spend_n_minus_3":null,"wins":3,"cpa":null,"insufficient_data":true}],"lead_log":[],"stale":false}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="assets/charts.js"></script>
+</body>
+</html>
