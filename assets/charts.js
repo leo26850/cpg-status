@@ -21,7 +21,7 @@
         labels: data.monthly.map(m => m.month),
         datasets: [
           { label: 'gads_lp', data: data.monthly.map(m => m.leads_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.leads_by_source.bison_cold), backgroundColor: '#3F3F3F', borderRadius: 0 },
+          { label: 'bison_cold', data: data.monthly.map(m => m.leads_by_source.bison_cold), backgroundColor: '#60A5FA', borderRadius: 0 },
         ],
       },
       options: {
@@ -70,7 +70,7 @@
         labels: data.monthly.map(m => m.month),
         datasets: [
           { label: 'gads_lp', data: data.monthly.map(m => m.mql_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.mql_by_source.bison_cold), backgroundColor: '#3F3F3F', borderRadius: 0 },
+          { label: 'bison_cold', data: data.monthly.map(m => m.mql_by_source.bison_cold), backgroundColor: '#60A5FA', borderRadius: 0 },
         ],
       },
       options: {
