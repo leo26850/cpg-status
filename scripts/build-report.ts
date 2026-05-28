@@ -1,7 +1,7 @@
 // scripts/build-report.ts
 import { BigQuery } from '@google-cloud/bigquery';
 import { OAuth2Client } from 'google-auth-library';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { aggregateMonthly, dedupLeads, toChannel, classifyMql, classifySql } from './compute/metrics.js';
 import { computeCohortCpa } from './compute/cohort.js';
@@ -119,6 +119,19 @@ async function main(): Promise<void> {
     return v?.target_record_id ? String(v.target_record_id) : null;
   }
 
+  // Extract person_id from a deal's 'associated_people' attribute (array of record-refs).
+  // Falls back to 'person' slug in case the workspace uses a different naming.
+  function getDealPersonId(r: { values?: Record<string, unknown[]> }): string | null {
+    // Primary: deals use 'associated_people' array
+    const arr = r.values?.associated_people as Array<Record<string, unknown>> | undefined;
+    if (arr && arr.length > 0) {
+      const tid = arr[0]?.target_record_id;
+      if (tid) return String(tid);
+    }
+    // Fallback: try 'person' (same as leads)
+    return getPersonId(r);
+  }
+
   const leads = attioLeadsRaw.map((r) => {
     const personId = getPersonId(r);
     const emailFromPerson = personId ? (personEmailMap.get(personId) ?? null) : null;
@@ -135,15 +148,18 @@ async function main(): Promise<void> {
   const sourceSet = new Set(leads.slice(0, 50).map((l) => l.lead_source));
   console.log(`  → Lead source values (sample): ${Array.from(sourceSet).join(', ')}`);
 
-  // Deals: check if deal has a linked person or direct email
+  // Deals: use associated_people (array) to resolve person → email, not 'person' slug
   const sampleDeal = attioDealsRaw.find((r) => r.values && Object.keys(r.values).length > 0);
   if (sampleDeal?.values) {
     const slugList = Object.keys(sampleDeal.values).slice(0, 20).join(', ');
     console.log(`  → Deal attribute slugs (sample): ${slugList}`);
+    // Log whether associated_people is present on the sample
+    const ap = sampleDeal.values?.associated_people as Array<Record<string, unknown>> | undefined;
+    console.log(`  → Deal associated_people[0]: ${JSON.stringify(ap?.[0])}`);
   }
 
   const deals = attioDealsRaw.map((r) => {
-    const personId = getPersonId(r);
+    const personId = getDealPersonId(r);
     const emailFromPerson = personId ? (personEmailMap.get(personId) ?? null) : null;
     return {
       id: r.id.record_id,
@@ -155,6 +171,10 @@ async function main(): Promise<void> {
       value: null,
     };
   });
+
+  // Log how many deals resolved an email via associated_people
+  const dealsWithEmail = deals.filter((d) => d.associated_lead_email !== null).length;
+  console.log(`  → ${dealsWithEmail}/${deals.length} deals resolved an email via People map`);
 
   console.log('Querying BQ: lp_form_submissions...');
   const lpSubmissions = await runQuery<{ email: string; submitted_at: { value: string } | string; source: string }>(
@@ -211,7 +231,24 @@ async function main(): Promise<void> {
     closed_won: deals.filter((d) => sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) === s && d.stage === 'Closed Won').length,
   }));
 
-  const lead_log: LeadLogRow[] = []; // Filled in Task 6.1 (hashing)
+  const { hashEmail } = await import('./render/hashing.js');
+  const recentLeads = dedupLeadsArr
+    .slice()
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 50);
+  const dealByEmail = new Map(deals.map((d) => [(d.associated_lead_email ?? '').toLowerCase().trim(), d]));
+  const lead_log: LeadLogRow[] = recentLeads.map((l) => {
+    const key = (l.email ?? '').toLowerCase().trim();
+    const deal = dealByEmail.get(key);
+    return {
+      created_at: l.created_at,
+      email_hash: hashEmail(l.email),
+      source: toChannel(l.lead_source),
+      is_mql: classifyMql(l.stage),
+      is_sql: deal ? classifySql(deal.stage) : false,
+      current_stage: deal?.stage ?? l.stage,
+    };
+  });
 
   const sql_stage_split = {
     proposal_sent: deals.filter((d) => d.stage === 'Proposal Sent').length,
@@ -241,6 +278,18 @@ async function main(): Promise<void> {
   const { renderHtml } = await import('./render/html.js');
   const html = renderHtml(report);
   writeFileSync('index.html', html);
+
+  // Generate monthly markdown for current month
+  const { renderMonthlyMarkdown } = await import('./render/markdown.js');
+  const currentMonth = today.slice(0, 7);
+  const markdown = renderMonthlyMarkdown(report, currentMonth);
+  const mdPath = process.env.KAMG_OPS_PATH
+    ? `${process.env.KAMG_OPS_PATH}/clients/cpg-affiliate/reports/${currentMonth}-metrics.md`
+    : `reports/local-${currentMonth}-metrics.md`;
+  if (!process.env.KAMG_OPS_PATH) mkdirSync('reports', { recursive: true });
+  writeFileSync(mdPath, markdown);
+  console.log(`Wrote markdown: ${mdPath}`);
+
   console.log(`Wrote data/report.json, ${monthSnap}, and index.html`);
   console.log(`Leads: ${attioLeadsRaw.length} raw (deduped ${dedupLeadsArr.length}) | Deals: ${attioDealsRaw.length} | MQL: ${mql} | SQL: ${sql} | Closed Won: ${closed_won}`);
   console.log(`LP submissions: ${lpSubmissions.length} | Vendor spend rows: ${vendorSpend.length}`);
