@@ -1,6 +1,6 @@
 # CPG Affiliate · 2026-05 · Lead Funnel
 
-_Generated 2026-05-28T16:59:55.041Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
+_Generated 2026-05-28T17:02:54.693Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
 
 ## Block 1 · Header strip
 
