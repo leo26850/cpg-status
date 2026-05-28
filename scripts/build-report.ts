@@ -208,27 +208,36 @@ async function main(): Promise<void> {
   const launchDate = '2026-05-11'; // per recon; LP form submissions started 2026-05-11
   const windowRange = { start: launchDate, end: today };
 
-  // Compute metrics
-  const monthly = aggregateMonthly(leads, deals, costs);
+  // Scope the funnel to in-scope channels only (gads_lp + bison_cold). Out-of-scope
+  // contacts (manual outreach / existing contacts / sales list) are excluded from
+  // MQL/SQL/Closed Won per the CPG rubric — 'other' is not part of the funnel.
+  const dedupLeadsArr = dedupLeads(leads);
+  const sourceByEmail = new Map(dedupLeadsArr.map((l) => [(l.email ?? '').toLowerCase().trim(), toChannel(l.lead_source)]));
+  const isInScope = (ch: Channel): boolean => ch === 'gads_lp' || ch === 'bison_cold';
+  const dealChannel = (d: { associated_lead_email: string | null }): Channel =>
+    sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) ?? 'other';
+  const inScopeLeads = dedupLeadsArr.filter((l) => isInScope(toChannel(l.lead_source)));
+  const inScopeDeals = deals.filter((d) => isInScope(dealChannel(d)));
+
+  // Compute metrics on the scoped sets
+  const monthly = aggregateMonthly(inScopeLeads, inScopeDeals, costs);
   const cohort = computeCohortCpa(monthly, launchDate, today);
 
-  const dedupLeadsArr = dedupLeads(leads);
-  const total_leads = dedupLeadsArr.length;
-  const mql = dedupLeadsArr.filter((l) => classifyMql(l.stage)).length;
-  const sql = deals.filter((d) => classifySql(d.stage)).length;
-  const closed_won = deals.filter((d) => d.stage === 'Closed Won').length;
+  const total_leads = inScopeLeads.length;
+  const mql = inScopeLeads.filter((l) => classifyMql(l.stage)).length;
+  const sql = inScopeDeals.filter((d) => classifySql(d.stage)).length;
+  const closed_won = inScopeDeals.filter((d) => d.stage === 'Closed Won').length;
   const currentMonthRow = monthly[monthly.length - 1];
   const cpl = currentMonthRow?.cpl ?? null;
   const cpa = cohort.find((c) => !c.insufficient_data && c.cpa !== null)?.cpa ?? null;
 
-  const sources: Channel[] = ['gads_lp', 'bison_cold', 'other'];
-  const sourceByEmail = new Map(dedupLeadsArr.map((l) => [(l.email ?? '').toLowerCase().trim(), toChannel(l.lead_source)]));
+  const sources: Channel[] = ['gads_lp', 'bison_cold'];
   const by_source = sources.map((s) => ({
     source: s,
-    leads: dedupLeadsArr.filter((l) => toChannel(l.lead_source) === s).length,
-    mql: dedupLeadsArr.filter((l) => toChannel(l.lead_source) === s && classifyMql(l.stage)).length,
-    sql: deals.filter((d) => sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) === s && classifySql(d.stage)).length,
-    closed_won: deals.filter((d) => sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) === s && d.stage === 'Closed Won').length,
+    leads: inScopeLeads.filter((l) => toChannel(l.lead_source) === s).length,
+    mql: inScopeLeads.filter((l) => toChannel(l.lead_source) === s && classifyMql(l.stage)).length,
+    sql: inScopeDeals.filter((d) => dealChannel(d) === s && classifySql(d.stage)).length,
+    closed_won: inScopeDeals.filter((d) => dealChannel(d) === s && d.stage === 'Closed Won').length,
   }));
 
   const { hashEmail } = await import('./render/hashing.js');
@@ -251,8 +260,8 @@ async function main(): Promise<void> {
   });
 
   const sql_stage_split = {
-    proposal_sent: deals.filter((d) => d.stage === 'Proposal Sent').length,
-    negotiating: deals.filter((d) => d.stage === 'Negotiating').length,
+    proposal_sent: inScopeDeals.filter((d) => d.stage === 'Proposal Sent').length,
+    negotiating: inScopeDeals.filter((d) => d.stage === 'Negotiating').length,
     closed_won,
   };
 

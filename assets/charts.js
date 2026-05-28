@@ -29,7 +29,7 @@
         maintainAspectRatio: false,
         scales: {
           x: { stacked: true, grid: { display: false } },
-          y: { stacked: true, beginAtZero: true, grid: { color: '#E0E0E0' } },
+          y: { stacked: true, beginAtZero: true, ticks: { stepSize: 10, precision: 0 }, grid: { color: '#E0E0E0' } },
         },
         plugins: { legend: { position: 'bottom' } },
       },
