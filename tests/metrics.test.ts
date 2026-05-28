@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { dedupLeads, isJunkEmail, type RawLead, toChannel, classifyMql, classifySql, type RawDeal } from '../scripts/compute/metrics';
+import { dedupLeads, isJunkEmail, type RawLead, toChannel, classifyMql, classifySql, type RawDeal, aggregateMonthly } from '../scripts/compute/metrics';
+import type { MonthlyCost } from '../scripts/compute/types';
 
 describe('isJunkEmail', () => {
   it('returns true for +test addresses', () => {
@@ -109,5 +110,51 @@ describe('classifySql', () => {
     expect(classifySql('Closed Lost')).toBe(false);
     expect(classifySql('Gone Cold')).toBe(false);
     expect(classifySql('Disqualified')).toBe(false);
+  });
+});
+
+describe('aggregateMonthly', () => {
+  const costs: MonthlyCost[] = [
+    { month: '2026-04', channel: 'gads_lp', media: 5000, tooling: 0, agency: 0 },
+    { month: '2026-04', channel: 'bison_cold', media: 5000, tooling: 0, agency: 0 },
+  ];
+  const leads: RawLead[] = [
+    { id: '1', email: 'a@x.io', created_at: '2026-04-01', lead_source: 'gads_lp', stage: 'Booked Call' },
+    { id: '2', email: 'b@x.io', created_at: '2026-04-05', lead_source: 'gads_lp', stage: 'New' },
+    { id: '3', email: 'c@x.io', created_at: '2026-04-10', lead_source: 'bison_cold', stage: 'Booked Call' },
+    { id: '4', email: 'd@x.io', created_at: '2026-04-11', lead_source: 'bison_cold', stage: 'Disqualified' },
+  ];
+  const deals: RawDeal[] = [
+    { id: 'd1', associated_company: 'c1', associated_lead_email: 'a@x.io', stage: 'Proposal Sent', stage_updated_at: '2026-04-20', created_at: '2026-04-15', value: 10000 },
+  ];
+
+  it('computes 4 leads, 2 MQL, 1 SQL for April', () => {
+    const rows = aggregateMonthly(leads, deals, costs);
+    const apr = rows.find((r) => r.month === '2026-04');
+    expect(apr).toBeDefined();
+    expect(apr!.total_leads).toBe(4);
+    expect(apr!.mql).toBe(2);
+    expect(apr!.sql).toBe(1);
+  });
+
+  it('computes CPL = total_spend / total_leads', () => {
+    const rows = aggregateMonthly(leads, deals, costs);
+    const apr = rows.find((r) => r.month === '2026-04')!;
+    expect(apr.spend_total).toBe(10000);
+    expect(apr.cpl).toBe(2500); // 10000 / 4
+  });
+
+  it('CPL is null when monthly_costs missing the month', () => {
+    const rows = aggregateMonthly(leads, deals, []);
+    const apr = rows.find((r) => r.month === '2026-04')!;
+    expect(apr.cpl).toBe(null);
+  });
+
+  it('groups leads_by_source correctly', () => {
+    const rows = aggregateMonthly(leads, deals, costs);
+    const apr = rows.find((r) => r.month === '2026-04')!;
+    expect(apr.leads_by_source.gads_lp).toBe(2);
+    expect(apr.leads_by_source.bison_cold).toBe(2);
+    expect(apr.leads_by_source.other).toBe(0);
   });
 });

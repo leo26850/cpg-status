@@ -1,5 +1,7 @@
 // scripts/compute/metrics.ts
-import type { Channel } from './types';
+import type { Channel, MonthlyRow, MonthlyCost as MC } from './types';
+
+export type { MonthlyCost } from './types';
 
 export type RawLead = {
   id: string;
@@ -66,4 +68,79 @@ export function classifyMql(stage: string): boolean {
 
 export function classifySql(stage: string): boolean {
   return SQL_STAGES.has(stage);
+}
+
+function monthKey(iso: string): string {
+  return iso.slice(0, 7); // "YYYY-MM"
+}
+
+export function aggregateMonthly(
+  leadsRaw: RawLead[],
+  deals: RawDeal[],
+  costs: MC[],
+): MonthlyRow[] {
+  const leads = dedupLeads(leadsRaw);
+  const monthsSet = new Set<string>();
+  for (const l of leads) monthsSet.add(monthKey(l.created_at));
+  for (const c of costs) monthsSet.add(c.month);
+  const months = Array.from(monthsSet).sort();
+
+  const emptyChannelCounts = (): Record<Channel, number> => ({ gads_lp: 0, bison_cold: 0, other: 0 });
+
+  const rows: MonthlyRow[] = [];
+
+  for (const month of months) {
+    const monthLeads = leads.filter((l) => monthKey(l.created_at) === month);
+    const leads_by_source = emptyChannelCounts();
+    const mql_by_source = emptyChannelCounts();
+    let mql = 0;
+    for (const l of monthLeads) {
+      const ch = toChannel(l.lead_source);
+      leads_by_source[ch]++;
+      if (classifyMql(l.stage)) {
+        mql++;
+        mql_by_source[ch]++;
+      }
+    }
+
+    const monthDealsSql = deals.filter(
+      (d) => monthKey(d.stage_updated_at) === month && classifySql(d.stage),
+    );
+    const sql = monthDealsSql.length;
+    const sql_stage_split = {
+      proposal_sent: monthDealsSql.filter((d) => d.stage === 'Proposal Sent').length,
+      negotiating: monthDealsSql.filter((d) => d.stage === 'Negotiating').length,
+      closed_won: monthDealsSql.filter((d) => d.stage === 'Closed Won').length,
+    };
+
+    const monthCosts = costs.filter((c) => c.month === month);
+    const spend_by_source = emptyChannelCounts();
+    let spend_total = 0;
+    for (const c of monthCosts) {
+      const ch = c.channel;
+      const total = c.media + c.tooling + c.agency;
+      spend_by_source[ch] += total;
+      spend_total += total;
+    }
+    const hasCost = monthCosts.length > 0;
+    const total_leads = monthLeads.length;
+
+    rows.push({
+      month,
+      total_leads,
+      leads_by_source,
+      mql,
+      mql_by_source,
+      sql,
+      sql_stage_split,
+      spend_total,
+      spend_by_source,
+      cpl: hasCost && total_leads > 0 ? spend_total / total_leads : null,
+      cpl_to_mql: hasCost && mql > 0 ? spend_total / mql : null,
+      mql_rate: total_leads > 0 ? mql / total_leads : null,
+      sql_rate: mql > 0 ? sql / mql : null,
+    });
+  }
+
+  return rows;
 }
