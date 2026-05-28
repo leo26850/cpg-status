@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-05-28T16:30:15.752Z",
+  "generated_at": "2026-05-28T16:53:25.818Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-28"
   },
   "launch_date": "2026-05-11",
   "kpis": {
-    "total_leads": 80,
+    "total_leads": 79,
     "mql": 28,
-    "sql": 73,
-    "closed_won": 42,
-    "cpl": 169.4915254237288,
+    "sql": 12,
+    "closed_won": 3,
+    "cpl": 172.41379310344828,
     "cpa": null
   },
   "monthly": [
@@ -28,11 +28,11 @@
         "bison_cold": 7,
         "other": 0
       },
-      "sql": 61,
+      "sql": 1,
       "sql_stage_split": {
-        "proposal_sent": 3,
-        "negotiating": 19,
-        "closed_won": 39
+        "proposal_sent": 0,
+        "negotiating": 0,
+        "closed_won": 1
       },
       "spend_total": 4000,
       "spend_by_source": {
@@ -43,27 +43,27 @@
       "cpl": 190.47619047619048,
       "cpl_to_mql": 571.4285714285714,
       "mql_rate": 0.3333333333333333,
-      "sql_rate": 8.714285714285714
+      "sql_rate": 0.14285714285714285
     },
     {
       "month": "2026-05",
-      "total_leads": 59,
+      "total_leads": 58,
       "leads_by_source": {
         "gads_lp": 0,
         "bison_cold": 58,
-        "other": 1
+        "other": 0
       },
       "mql": 21,
       "mql_by_source": {
         "gads_lp": 0,
-        "bison_cold": 20,
-        "other": 1
+        "bison_cold": 21,
+        "other": 0
       },
-      "sql": 12,
+      "sql": 11,
       "sql_stage_split": {
         "proposal_sent": 9,
         "negotiating": 0,
-        "closed_won": 3
+        "closed_won": 2
       },
       "spend_total": 10000,
       "spend_by_source": {
@@ -71,10 +71,10 @@
         "bison_cold": 5000,
         "other": 0
       },
-      "cpl": 169.4915254237288,
+      "cpl": 172.41379310344828,
       "cpl_to_mql": 476.1904761904762,
-      "mql_rate": 0.3559322033898305,
-      "sql_rate": 0.5714285714285714
+      "mql_rate": 0.3620689655172414,
+      "sql_rate": 0.5238095238095238
     }
   ],
   "by_source": [
@@ -88,41 +88,34 @@
     {
       "source": "bison_cold",
       "leads": 79,
-      "mql": 27,
+      "mql": 28,
       "sql": 12,
       "closed_won": 3
-    },
-    {
-      "source": "other",
-      "leads": 1,
-      "mql": 1,
-      "sql": 0,
-      "closed_won": 0
     }
   ],
   "funnel": {
-    "leads": 80,
+    "leads": 79,
     "mql": 28,
-    "sql": 73,
-    "closed_won": 42
+    "sql": 12,
+    "closed_won": 3
   },
   "sql_stage_split": {
-    "proposal_sent": 12,
-    "negotiating": 19,
-    "closed_won": 42
+    "proposal_sent": 9,
+    "negotiating": 0,
+    "closed_won": 3
   },
   "cohort_cpa": [
     {
       "cohort_month": "2026-04",
       "spend_n_minus_3": null,
-      "wins": 39,
+      "wins": 1,
       "cpa": null,
       "insufficient_data": true
     },
     {
       "cohort_month": "2026-05",
       "spend_n_minus_3": null,
-      "wins": 3,
+      "wins": 2,
       "cpa": null,
       "insufficient_data": true
     }
@@ -140,9 +133,9 @@
       "created_at": "2026-05-28T04:12:29.363000000Z",
       "email_hash": "5312eb4f-idan",
       "source": "bison_cold",
-      "is_mql": false,
+      "is_mql": true,
       "is_sql": false,
-      "current_stage": "In Conversation"
+      "current_stage": "Booked Call"
     },
     {
       "created_at": "2026-05-27T22:25:57.621000000Z",
@@ -174,7 +167,7 @@
       "source": "bison_cold",
       "is_mql": true,
       "is_sql": false,
-      "current_stage": "Call Scheduled"
+      "current_stage": "Discovery Call Done"
     },
     {
       "created_at": "2026-05-26T21:21:51.614000000Z",
