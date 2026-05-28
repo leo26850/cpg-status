@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-05-28T03:38:46.314Z",
+  "generated_at": "2026-05-28T16:30:15.752Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-28"
   },
   "launch_date": "2026-05-11",
   "kpis": {
-    "total_leads": 78,
+    "total_leads": 80,
     "mql": 28,
-    "sql": 71,
-    "closed_won": 41,
-    "cpl": 175.43859649122808,
+    "sql": 73,
+    "closed_won": 42,
+    "cpl": 169.4915254237288,
     "cpa": null
   },
   "monthly": [
@@ -28,11 +28,11 @@
         "bison_cold": 7,
         "other": 0
       },
-      "sql": 60,
+      "sql": 61,
       "sql_stage_split": {
-        "proposal_sent": 2,
-        "negotiating": 20,
-        "closed_won": 38
+        "proposal_sent": 3,
+        "negotiating": 19,
+        "closed_won": 39
       },
       "spend_total": 4000,
       "spend_by_source": {
@@ -43,14 +43,14 @@
       "cpl": 190.47619047619048,
       "cpl_to_mql": 571.4285714285714,
       "mql_rate": 0.3333333333333333,
-      "sql_rate": 8.571428571428571
+      "sql_rate": 8.714285714285714
     },
     {
       "month": "2026-05",
-      "total_leads": 57,
+      "total_leads": 59,
       "leads_by_source": {
         "gads_lp": 0,
-        "bison_cold": 56,
+        "bison_cold": 58,
         "other": 1
       },
       "mql": 21,
@@ -59,9 +59,9 @@
         "bison_cold": 20,
         "other": 1
       },
-      "sql": 11,
+      "sql": 12,
       "sql_stage_split": {
-        "proposal_sent": 8,
+        "proposal_sent": 9,
         "negotiating": 0,
         "closed_won": 3
       },
@@ -71,10 +71,10 @@
         "bison_cold": 5000,
         "other": 0
       },
-      "cpl": 175.43859649122808,
+      "cpl": 169.4915254237288,
       "cpl_to_mql": 476.1904761904762,
-      "mql_rate": 0.3684210526315789,
-      "sql_rate": 0.5238095238095238
+      "mql_rate": 0.3559322033898305,
+      "sql_rate": 0.5714285714285714
     }
   ],
   "by_source": [
@@ -87,9 +87,9 @@
     },
     {
       "source": "bison_cold",
-      "leads": 77,
+      "leads": 79,
       "mql": 27,
-      "sql": 11,
+      "sql": 12,
       "closed_won": 3
     },
     {
@@ -101,21 +101,21 @@
     }
   ],
   "funnel": {
-    "leads": 78,
+    "leads": 80,
     "mql": 28,
-    "sql": 71,
-    "closed_won": 41
+    "sql": 73,
+    "closed_won": 42
   },
   "sql_stage_split": {
-    "proposal_sent": 10,
-    "negotiating": 20,
-    "closed_won": 41
+    "proposal_sent": 12,
+    "negotiating": 19,
+    "closed_won": 42
   },
   "cohort_cpa": [
     {
       "cohort_month": "2026-04",
       "spend_n_minus_3": null,
-      "wins": 38,
+      "wins": 39,
       "cpa": null,
       "insufficient_data": true
     },
@@ -129,12 +129,36 @@
   ],
   "lead_log": [
     {
+      "created_at": "2026-05-28T12:05:00.580000000Z",
+      "email_hash": "4542d056-sd",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-28T04:12:29.363000000Z",
+      "email_hash": "5312eb4f-idan",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
+    },
+    {
       "created_at": "2026-05-27T22:25:57.621000000Z",
       "email_hash": "7b9f84b3-llin",
       "source": "bison_cold",
       "is_mql": false,
       "is_sql": false,
-      "current_stage": "Gone Cold"
+      "current_stage": "In Conversation"
+    },
+    {
+      "created_at": "2026-05-27T18:38:21.582000000Z",
+      "email_hash": "27546ad7-zach",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "In Conversation"
     },
     {
       "created_at": "2026-05-27T14:00:02.270000000Z",
@@ -313,14 +337,6 @@
       "current_stage": "In Conversation"
     },
     {
-      "created_at": "2026-05-16T04:02:03.060000000Z",
-      "email_hash": "27546ad7-zach",
-      "source": "bison_cold",
-      "is_mql": false,
-      "is_sql": false,
-      "current_stage": "In Conversation"
-    },
-    {
       "created_at": "2026-05-12T19:50:43.501000000Z",
       "email_hash": "c0ead8f1-hron",
       "source": "bison_cold",
@@ -461,8 +477,8 @@
       "email_hash": "5cb62313-mour",
       "source": "bison_cold",
       "is_mql": true,
-      "is_sql": false,
-      "current_stage": "Booked Call"
+      "is_sql": true,
+      "current_stage": "Proposal Sent"
     },
     {
       "created_at": "2026-05-05T19:20:52.368000000Z",
@@ -507,22 +523,6 @@
     {
       "created_at": "2026-05-05T12:22:38.237000000Z",
       "email_hash": "3e63bf2b-hewm",
-      "source": "bison_cold",
-      "is_mql": false,
-      "is_sql": false,
-      "current_stage": "In Conversation"
-    },
-    {
-      "created_at": "2026-05-04T05:49:27.232000000Z",
-      "email_hash": "85b17372-alex",
-      "source": "bison_cold",
-      "is_mql": false,
-      "is_sql": false,
-      "current_stage": "In Conversation"
-    },
-    {
-      "created_at": "2026-05-03T19:26:27.136000000Z",
-      "email_hash": "38bc5fba-lena",
       "source": "bison_cold",
       "is_mql": false,
       "is_sql": false,

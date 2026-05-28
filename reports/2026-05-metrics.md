@@ -1,6 +1,6 @@
 # CPG Affiliate · 2026-05 · Lead Funnel
 
-_Generated 2026-05-28T03:38:46.314Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
+_Generated 2026-05-28T16:30:15.752Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
 
 ## Block 1 · Header strip
 
@@ -19,24 +19,24 @@ _Generated 2026-05-28T03:38:46.314Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 | Metric | Value |
 |---|---|
 | Total spend (fully-loaded) | $10,000 |
-| Leads (deduped) | 57 |
-| CPL | $175 |
+| Leads (deduped) | 59 |
+| CPL | $169 |
 
 ## Block 3 · Inbound leads by source
 
 | Source | Count |
 |---|---|
 | gads_lp | 0 |
-| bison_cold | 56 |
+| bison_cold | 58 |
 | Other | 1 |
-| **Total** | **57** |
+| **Total** | **59** |
 
 ## Block 4 · MQL total
 
 | Metric | Value |
 |---|---|
 | MQL (Booked Call stage) | 21 |
-| MQL rate | 36.8% |
+| MQL rate | 35.6% |
 | CPL → MQL | $476 |
 
 ## Block 5 · MQL by source
@@ -50,11 +50,11 @@ _Generated 2026-05-28T03:38:46.314Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 
 | Metric | Value |
 |---|---|
-| SQL total (Proposal Sent + Negotiating + Closed Won) | 11 |
-| Proposal Sent | 8 |
+| SQL total (Proposal Sent + Negotiating + Closed Won) | 12 |
+| Proposal Sent | 9 |
 | Negotiating | 0 |
 | Closed Won | 3 |
-| SQL rate (vs MQL) | 52.4% |
+| SQL rate (vs MQL) | 57.1% |
 
 _SQL rejection reason codes not tracked at CPG — see metrics-rubric.md._
 
