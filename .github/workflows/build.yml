@@ -1,0 +1,81 @@
+name: Build report
+
+on:
+  schedule:
+    - cron: '0 6 * * 0' # Sundays 06:00 UTC
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build-report
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Auth GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build report
+        env:
+          ATTIO_API_KEY: ${{ secrets.ATTIO_API_KEY }}
+        run: npm run build
+
+      - name: Commit generated report + dashboard
+        run: |
+          git config user.email "cpg-status-bot@users.noreply.github.com"
+          git config user.name "cpg-status bot"
+          git add index.html data/report.json data/*.json reports/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: rebuild report [skip ci]"
+            git push origin HEAD:main
+          fi
+
+      - name: Assemble Pages site
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp index.html _site/
+          cp -r assets _site/
+          cp -r data _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
