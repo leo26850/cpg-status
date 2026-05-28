@@ -91,7 +91,7 @@ function renderBySource(r: ReportData, fmt: (n: number | null, opts?: { currency
   return `<section><div class="container">
     <span class="section-num">04 · Source mix</span>
     <h2>Inbound leads by source</h2>
-    <div class="card"><canvas id="chart-by-source" height="100"></canvas></div>
+    <div class="card"><canvas id="chart-by-source" height="340"></canvas></div>
     <table style="margin-top: 24px;">
       <thead><tr><th>Month</th><th>gads_lp</th><th>bison_cold</th><th>Total</th></tr></thead>
       <tbody>${rows}</tbody>
