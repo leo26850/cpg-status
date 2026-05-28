@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dedupLeads, isJunkEmail, type RawLead } from '../scripts/compute/metrics';
+import { dedupLeads, isJunkEmail, type RawLead, toChannel, classifyMql, classifySql, type RawDeal } from '../scripts/compute/metrics';
 
 describe('isJunkEmail', () => {
   it('returns true for +test addresses', () => {
@@ -49,5 +49,65 @@ describe('dedupLeads', () => {
     const out = dedupLeads(leads);
     expect(out).toHaveLength(1);
     expect(out[0].email).toBe('real@acme.io');
+  });
+});
+
+describe('toChannel', () => {
+  it('maps gads variations', () => {
+    expect(toChannel('gads_lp')).toBe('gads_lp');
+    expect(toChannel('Gads')).toBe('gads_lp');
+    expect(toChannel('Google Ads')).toBe('gads_lp');
+    expect(toChannel('googleads')).toBe('gads_lp');
+  });
+  it('maps bison variations', () => {
+    expect(toChannel('bison_cold')).toBe('bison_cold');
+    expect(toChannel('Bison')).toBe('bison_cold');
+    expect(toChannel('Instantly')).toBe('bison_cold');
+    expect(toChannel('cold email')).toBe('bison_cold');
+  });
+  it('maps anything else to other', () => {
+    expect(toChannel('organic')).toBe('other');
+    expect(toChannel('Direct')).toBe('other');
+    expect(toChannel('Manual')).toBe('other');
+    expect(toChannel('')).toBe('other');
+    expect(toChannel(null)).toBe('other');
+  });
+});
+
+describe('classifyMql', () => {
+  it('returns true for Booked Call stage', () => {
+    expect(classifyMql('Booked Call')).toBe(true);
+  });
+  it('returns false for upstream stages', () => {
+    expect(classifyMql('New')).toBe(false);
+    expect(classifyMql('In Conversation')).toBe(false);
+  });
+  it('returns true for downstream Promoted (already passed MQL gate)', () => {
+    expect(classifyMql('Promoted')).toBe(true);
+  });
+  it('returns false for Disqualified', () => {
+    expect(classifyMql('Disqualified')).toBe(false);
+  });
+});
+
+describe('classifySql', () => {
+  it('returns true for Proposal Sent', () => {
+    expect(classifySql('Proposal Sent')).toBe(true);
+  });
+  it('returns true for Negotiating', () => {
+    expect(classifySql('Negotiating')).toBe(true);
+  });
+  it('returns true for Closed Won', () => {
+    expect(classifySql('Closed Won')).toBe(true);
+  });
+  it('returns false for upstream deal stages', () => {
+    expect(classifySql('Discovery Call Done')).toBe(false);
+    expect(classifySql('Following Up')).toBe(false);
+    expect(classifySql('Follow Up Call Done')).toBe(false);
+  });
+  it('returns false for terminal failure stages', () => {
+    expect(classifySql('Closed Lost')).toBe(false);
+    expect(classifySql('Gone Cold')).toBe(false);
+    expect(classifySql('Disqualified')).toBe(false);
   });
 });
