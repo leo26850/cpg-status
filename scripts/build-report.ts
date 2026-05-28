@@ -1,0 +1,291 @@
+// scripts/build-report.ts
+import { BigQuery } from '@google-cloud/bigquery';
+import { OAuth2Client } from 'google-auth-library';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { aggregateMonthly, dedupLeads, toChannel, classifyMql, classifySql } from './compute/metrics.js';
+import { computeCohortCpa } from './compute/cohort.js';
+import { fetchAllRecords, attioString, attioTimestamp, attioStage } from './attio/client.js';
+import type { Channel, MonthlyCost, ReportData, LeadLogRow } from './compute/types.js';
+
+const PROJECT = 'cpg-data-warehouse';
+
+// Create BigQuery client.
+// If GOOGLE_ACCESS_TOKEN is set, use it directly via OAuth2Client to bypass ADC refresh issues.
+// Otherwise fall through to the standard ADC / GOOGLE_APPLICATION_CREDENTIALS flow.
+function createBqClient(): BigQuery {
+  const accessToken = process.env.GOOGLE_ACCESS_TOKEN;
+  if (accessToken) {
+    const authClient = new OAuth2Client();
+    authClient.setCredentials({ access_token: accessToken });
+    return new BigQuery({ projectId: PROJECT, authClient } as ConstructorParameters<typeof BigQuery>[0]);
+  }
+  return new BigQuery({ projectId: PROJECT });
+}
+
+async function runQuery<T>(bq: BigQuery, sqlPath: string, params: Record<string, unknown> = {}, location = 'US'): Promise<T[]> {
+  const sql = readFileSync(resolve(sqlPath), 'utf-8');
+  // Strip single-line comments so they don't interfere with named parameters
+  const cleanSql = sql.replace(/--[^\n]*/g, '').trim();
+  const [rows] = await bq.query({ query: cleanSql, params, location });
+  return rows as T[];
+}
+
+// Inspect a sample Attio record to find the real attribute slug for email.
+// Attio workspaces vary — the slug may be 'email_address', 'primary_email_address', 'email', etc.
+// Returns the first slug whose values array is non-empty and contains an email-like string.
+function detectEmailSlug(sampleRecord: { values?: Record<string, unknown[]> } | undefined): string {
+  if (!sampleRecord?.values) return 'email_address';
+  const candidates = ['email_address', 'primary_email_address', 'email'];
+  for (const slug of candidates) {
+    const v = sampleRecord.values[slug];
+    if (v && v.length > 0) {
+      // Check if it looks like an email value
+      const entry = v[0] as Record<string, unknown>;
+      const val = entry?.value ?? entry?.email_address ?? entry?.original_email_address;
+      if (val && String(val).includes('@')) return slug;
+    }
+  }
+  // Fallback: scan all keys for anything containing "email" that has a value
+  for (const key of Object.keys(sampleRecord.values)) {
+    if (!key.toLowerCase().includes('email')) continue;
+    const v = sampleRecord.values[key];
+    if (v && v.length > 0) {
+      const entry = v[0] as Record<string, unknown>;
+      const val = entry?.value ?? entry?.email_address ?? entry?.original_email_address;
+      if (val && String(val).includes('@')) return key;
+    }
+  }
+  return 'email_address'; // last resort
+}
+
+// Extract email from an Attio record, trying multiple attribute shapes.
+// Attio email attributes can have value at .value, .email_address, or .original_email_address
+function extractEmail(record: { values?: Record<string, unknown[]> }, slug: string): string | null {
+  const vals = record.values?.[slug];
+  if (!vals || vals.length === 0) return null;
+  const v = vals[0] as Record<string, unknown>;
+  const raw = v?.value ?? v?.email_address ?? v?.original_email_address ?? null;
+  return raw ? String(raw).toLowerCase().trim() : null;
+}
+
+async function main(): Promise<void> {
+  const attioKey = process.env.ATTIO_API_KEY;
+  if (!attioKey) throw new Error('ATTIO_API_KEY env var required');
+
+  const bq = createBqClient();
+  const today = new Date().toISOString().slice(0, 10);
+
+  console.log('Reading monthly_costs.json...');
+  const jsonCosts: MonthlyCost[] = JSON.parse(readFileSync('data/monthly_costs.json', 'utf-8'));
+
+  console.log('Fetching Attio Leads...');
+  const attioLeadsRaw = await fetchAllRecords('leads', attioKey);
+  console.log(`  → ${attioLeadsRaw.length} raw lead records`);
+
+  console.log('Fetching Attio Deals...');
+  const attioDealsRaw = await fetchAllRecords('deals', attioKey);
+  console.log(`  → ${attioDealsRaw.length} raw deal records`);
+
+  // Email on Attio Leads lives on the linked People record (record-reference).
+  // The lead has values.person[0].target_record_id → look up People to get email.
+  // Fetch People records and build personId → email map.
+  console.log('Fetching Attio People (for email join)...');
+  const attioPeopleRaw = await fetchAllRecords('people', attioKey);
+  console.log(`  → ${attioPeopleRaw.length} people records`);
+
+  // Build personId → email map (first non-empty email_addresses entry)
+  const personEmailMap = new Map<string, string>();
+  for (const p of attioPeopleRaw) {
+    const emailEntries = p.values?.email_addresses as Array<Record<string, unknown>> | undefined;
+    if (!emailEntries || emailEntries.length === 0) continue;
+    const email = emailEntries[0]?.email_address ?? emailEntries[0]?.original_email_address;
+    if (email && String(email).includes('@')) {
+      personEmailMap.set(p.id.record_id, String(email).toLowerCase().trim());
+    }
+  }
+  console.log(`  → ${personEmailMap.size} people with emails`);
+
+  // Log sample lead attribute slugs
+  const sampleLead = attioLeadsRaw.find((r) => r.values && Object.keys(r.values).length > 0);
+  if (sampleLead?.values) {
+    const slugList = Object.keys(sampleLead.values).slice(0, 20).join(', ');
+    console.log(`  → Lead attribute slugs (sample): ${slugList}`);
+  }
+
+  // Extract person_id from a lead's 'person' attribute (record-reference)
+  function getPersonId(r: { values?: Record<string, unknown[]> }): string | null {
+    const v = r.values?.person?.[0] as Record<string, unknown> | undefined;
+    return v?.target_record_id ? String(v.target_record_id) : null;
+  }
+
+  const leads = attioLeadsRaw.map((r) => {
+    const personId = getPersonId(r);
+    const emailFromPerson = personId ? (personEmailMap.get(personId) ?? null) : null;
+    return {
+      id: r.id.record_id,
+      email: emailFromPerson,
+      created_at: r.created_at ?? attioTimestamp(r, 'created_at') ?? '',
+      lead_source: attioString(r, 'lead_source') ?? '',
+      stage: attioStage(r, 'stage') ?? '',
+    };
+  });
+
+  // Log a sample of lead sources for inspection
+  const sourceSet = new Set(leads.slice(0, 50).map((l) => l.lead_source));
+  console.log(`  → Lead source values (sample): ${Array.from(sourceSet).join(', ')}`);
+
+  // Deals: check if deal has a linked person or direct email
+  const sampleDeal = attioDealsRaw.find((r) => r.values && Object.keys(r.values).length > 0);
+  if (sampleDeal?.values) {
+    const slugList = Object.keys(sampleDeal.values).slice(0, 20).join(', ');
+    console.log(`  → Deal attribute slugs (sample): ${slugList}`);
+  }
+
+  const deals = attioDealsRaw.map((r) => {
+    const personId = getPersonId(r);
+    const emailFromPerson = personId ? (personEmailMap.get(personId) ?? null) : null;
+    return {
+      id: r.id.record_id,
+      associated_company: null,
+      associated_lead_email: emailFromPerson,
+      stage: attioStage(r, 'stage') ?? '',
+      stage_updated_at: attioTimestamp(r, 'stage_updated_at') ?? r.created_at ?? '',
+      created_at: r.created_at ?? '',
+      value: null,
+    };
+  });
+
+  console.log('Querying BQ: lp_form_submissions...');
+  const lpSubmissions = await runQuery<{ email: string; submitted_at: { value: string } | string; source: string }>(
+    bq,
+    'scripts/queries/lp_submissions.sql',
+    { start_date: '2026-05-01' },
+  );
+  console.log(`  → ${lpSubmissions.length} LP submission rows`);
+
+  console.log('Querying BQ: vendor_spend...');
+  // vendor_spend schema: month (DATE), vendor (STRING), category, amount_usd (NUMERIC), notes
+  // Dataset 'cpg' is in us-central1 (not US) — must pass explicit location.
+  // BQ returns DATE as { value: 'YYYY-MM-DD' } object in the Node.js client
+  const vendorSpend = await runQuery<{ month: { value: string } | string; vendor: string; category: string | null; amount_usd: number; notes: string | null }>(
+    bq,
+    'scripts/queries/vendor_spend.sql',
+    {},
+    'us-central1',
+  );
+  console.log(`  → ${vendorSpend.length} vendor_spend rows`);
+
+  // Merge spend sources: vendor_spend BQ rows win; monthly_costs.json fills gaps
+  // vendor_spend uses 'vendor' (supplier name) and 'amount_usd' columns
+  // Vendor-to-channel mapping:
+  //   "Vovik" → bison_cold (cold email infra)
+  //   "Google"/"gads" → gads_lp
+  //   Others → 'other' (skipped in merge)
+  const costs: MonthlyCost[] = mergeSpend(vendorSpend, jsonCosts);
+
+  // Determine window
+  const launchDate = '2026-05-11'; // per recon; LP form submissions started 2026-05-11
+  const windowRange = { start: launchDate, end: today };
+
+  // Compute metrics
+  const monthly = aggregateMonthly(leads, deals, costs);
+  const cohort = computeCohortCpa(monthly, launchDate, today);
+
+  const dedupLeadsArr = dedupLeads(leads);
+  const total_leads = dedupLeadsArr.length;
+  const mql = dedupLeadsArr.filter((l) => classifyMql(l.stage)).length;
+  const sql = deals.filter((d) => classifySql(d.stage)).length;
+  const closed_won = deals.filter((d) => d.stage === 'Closed Won').length;
+  const currentMonthRow = monthly[monthly.length - 1];
+  const cpl = currentMonthRow?.cpl ?? null;
+  const cpa = cohort.find((c) => !c.insufficient_data && c.cpa !== null)?.cpa ?? null;
+
+  const sources: Channel[] = ['gads_lp', 'bison_cold', 'other'];
+  const sourceByEmail = new Map(dedupLeadsArr.map((l) => [(l.email ?? '').toLowerCase().trim(), toChannel(l.lead_source)]));
+  const by_source = sources.map((s) => ({
+    source: s,
+    leads: dedupLeadsArr.filter((l) => toChannel(l.lead_source) === s).length,
+    mql: dedupLeadsArr.filter((l) => toChannel(l.lead_source) === s && classifyMql(l.stage)).length,
+    sql: deals.filter((d) => sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) === s && classifySql(d.stage)).length,
+    closed_won: deals.filter((d) => sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) === s && d.stage === 'Closed Won').length,
+  }));
+
+  const lead_log: LeadLogRow[] = []; // Filled in Task 6.1 (hashing)
+
+  const sql_stage_split = {
+    proposal_sent: deals.filter((d) => d.stage === 'Proposal Sent').length,
+    negotiating: deals.filter((d) => d.stage === 'Negotiating').length,
+    closed_won,
+  };
+
+  const report: ReportData = {
+    generated_at: new Date().toISOString(),
+    window: windowRange,
+    launch_date: launchDate,
+    kpis: { total_leads, mql, sql, closed_won, cpl, cpa },
+    monthly,
+    by_source,
+    funnel: { leads: total_leads, mql, sql, closed_won },
+    sql_stage_split,
+    cohort_cpa: cohort,
+    lead_log,
+    stale: false,
+  };
+
+  writeFileSync('data/report.json', JSON.stringify(report, null, 2));
+  const monthSnap = `data/${today.slice(0, 7)}.json`;
+  writeFileSync(monthSnap, JSON.stringify(report, null, 2));
+  console.log(`\nWrote data/report.json and ${monthSnap}`);
+  console.log(`Leads: ${attioLeadsRaw.length} raw (deduped ${dedupLeadsArr.length}) | Deals: ${attioDealsRaw.length} | MQL: ${mql} | SQL: ${sql} | Closed Won: ${closed_won}`);
+  console.log(`LP submissions: ${lpSubmissions.length} | Vendor spend rows: ${vendorSpend.length}`);
+}
+
+// Hybrid spend merge: vendor_spend BQ rows win over monthly_costs.json for the same (month, channel).
+// vendor_spend actual schema: month (DATE as {value: 'YYYY-MM-DD'}), vendor (STRING), amount_usd (NUMERIC)
+// Vendor-to-channel mapping: "Vovik" → bison_cold, "Google"/"gads" → gads_lp
+function mergeSpend(
+  vendorRows: Array<{ month: { value: string } | string; vendor: string; category: string | null; amount_usd: number; notes: string | null }>,
+  jsonCosts: MonthlyCost[],
+): MonthlyCost[] {
+  const out = new Map<string, MonthlyCost>();
+  // JSON costs as baseline
+  for (const c of jsonCosts) out.set(`${c.month}|${c.channel}`, c);
+
+  for (const v of vendorRows) {
+    // BQ DATE columns come back as { value: 'YYYY-MM-DD' } objects via the Node.js BQ client
+    const rawMonth = typeof v.month === 'object' && v.month !== null ? (v.month as { value: string }).value : String(v.month);
+    const month = rawMonth.slice(0, 7); // 'YYYY-MM'
+    const vendorLower = v.vendor.toLowerCase();
+
+    // Map vendor name to channel slug
+    let channel: Channel | null = null;
+    if (vendorLower.includes('vovik') || vendorLower.includes('bison') || vendorLower.includes('cold')) {
+      channel = 'bison_cold';
+    } else if (vendorLower.includes('google') || vendorLower.includes('gads') || vendorLower.includes('ads')) {
+      channel = 'gads_lp';
+    }
+    // Unknown vendor → skip (don't pollute with 'other')
+    if (!channel || !month) continue;
+
+    const media = Number(v.amount_usd ?? 0);
+    // BQ rows win: upsert into the map (may overwrite JSON placeholder)
+    const existing = out.get(`${month}|${channel}`);
+    if (existing) {
+      // Add amounts from multiple rows for the same month+channel
+      out.set(`${month}|${channel}`, { ...existing, media: existing.media + media });
+    } else {
+      out.set(`${month}|${channel}`, { month, channel, media, tooling: 0, agency: 0 });
+    }
+  }
+
+  return Array.from(out.values()).sort((a, b) => `${a.month}|${a.channel}`.localeCompare(`${b.month}|${b.channel}`));
+}
+
+main().catch((err) => {
+  console.error('Build failed:', err);
+  if (existsSync('data/report.json')) {
+    writeFileSync('data/.stale', `Failed: ${new Date().toISOString()}: ${String(err.message)}\n`);
+  }
+  process.exit(1);
+});

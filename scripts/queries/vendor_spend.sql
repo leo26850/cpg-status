@@ -1,4 +1,5 @@
 -- Monthly fully-loaded spend per vendor from cpg.vendor_spend (primary).
+-- DATASET LOCATION: us-central1 (NOT US) — must use location='us-central1' in runQuery.
 -- Actual schema (confirmed 2026-05-27):
 --   month       DATE     REQUIRED  -- stored as first day of month (e.g. 2026-04-01)
 --   vendor      STRING   REQUIRED  -- vendor/supplier name (e.g. "Vovik", "Google", etc.)

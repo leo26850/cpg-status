@@ -11,7 +11,7 @@ export type AttioRecord = {
 type FetchImpl = typeof fetch;
 
 export async function fetchAllRecords(
-  objectSlug: 'leads' | 'deals',
+  objectSlug: string,
   apiKey: string,
   opts: { fetchImpl?: FetchImpl } = {},
 ): Promise<AttioRecord[]> {

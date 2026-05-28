@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-05-28T03:18:52.211Z",
+  "window": {
+    "start": "2026-05-11",
+    "end": "2026-05-28"
+  },
+  "launch_date": "2026-05-11",
+  "kpis": {
+    "total_leads": 78,
+    "mql": 28,
+    "sql": 71,
+    "closed_won": 41,
+    "cpl": 175.43859649122808,
+    "cpa": null
+  },
+  "monthly": [
+    {
+      "month": "2026-04",
+      "total_leads": 21,
+      "leads_by_source": {
+        "gads_lp": 0,
+        "bison_cold": 21,
+        "other": 0
+      },
+      "mql": 7,
+      "mql_by_source": {
+        "gads_lp": 0,
+        "bison_cold": 7,
+        "other": 0
+      },
+      "sql": 60,
+      "sql_stage_split": {
+        "proposal_sent": 2,
+        "negotiating": 20,
+        "closed_won": 38
+      },
+      "spend_total": 4000,
+      "spend_by_source": {
+        "gads_lp": 0,
+        "bison_cold": 4000,
+        "other": 0
+      },
+      "cpl": 190.47619047619048,
+      "cpl_to_mql": 571.4285714285714,
+      "mql_rate": 0.3333333333333333,
+      "sql_rate": 8.571428571428571
+    },
+    {
+      "month": "2026-05",
+      "total_leads": 57,
+      "leads_by_source": {
+        "gads_lp": 0,
+        "bison_cold": 56,
+        "other": 1
+      },
+      "mql": 21,
+      "mql_by_source": {
+        "gads_lp": 0,
+        "bison_cold": 20,
+        "other": 1
+      },
+      "sql": 11,
+      "sql_stage_split": {
+        "proposal_sent": 8,
+        "negotiating": 0,
+        "closed_won": 3
+      },
+      "spend_total": 10000,
+      "spend_by_source": {
+        "gads_lp": 5000,
+        "bison_cold": 5000,
+        "other": 0
+      },
+      "cpl": 175.43859649122808,
+      "cpl_to_mql": 476.1904761904762,
+      "mql_rate": 0.3684210526315789,
+      "sql_rate": 0.5238095238095238
+    }
+  ],
+  "by_source": [
+    {
+      "source": "gads_lp",
+      "leads": 0,
+      "mql": 0,
+      "sql": 0,
+      "closed_won": 0
+    },
+    {
+      "source": "bison_cold",
+      "leads": 77,
+      "mql": 27,
+      "sql": 0,
+      "closed_won": 0
+    },
+    {
+      "source": "other",
+      "leads": 1,
+      "mql": 1,
+      "sql": 0,
+      "closed_won": 0
+    }
+  ],
+  "funnel": {
+    "leads": 78,
+    "mql": 28,
+    "sql": 71,
+    "closed_won": 41
+  },
+  "sql_stage_split": {
+    "proposal_sent": 10,
+    "negotiating": 20,
+    "closed_won": 41
+  },
+  "cohort_cpa": [
+    {
+      "cohort_month": "2026-04",
+      "spend_n_minus_3": null,
+      "wins": 38,
+      "cpa": null,
+      "insufficient_data": true
+    },
+    {
+      "cohort_month": "2026-05",
+      "spend_n_minus_3": null,
+      "wins": 3,
+      "cpa": null,
+      "insufficient_data": true
+    }
+  ],
+  "lead_log": [],
+  "stale": false
+}
