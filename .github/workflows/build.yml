@@ -46,6 +46,8 @@ jobs:
       - name: Build report
         env:
           ATTIO_API_KEY: ${{ secrets.ATTIO_API_KEY }}
+          BISON_API_KEY: ${{ secrets.BISON_API_KEY }}
+          BISON_WORKSPACE_ID: ${{ secrets.BISON_WORKSPACE_ID }}
         run: npm run build
 
       - name: Commit generated report + dashboard
