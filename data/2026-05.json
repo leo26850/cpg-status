@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-05-29T00:12:55.162Z",
+  "generated_at": "2026-05-29T01:34:37.852Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-29"
   },
   "launch_date": "2026-05-11",
   "kpis": {
-    "total_leads": 80,
+    "total_leads": 81,
     "mql": 28,
     "sql": 12,
     "closed_won": 3,
-    "cpl": 169.4915254237288,
+    "cpl": 166.66666666666666,
     "cpa": null
   },
   "monthly": [
@@ -47,10 +47,10 @@
     },
     {
       "month": "2026-05",
-      "total_leads": 59,
+      "total_leads": 60,
       "leads_by_source": {
         "gads_lp": 0,
-        "bison_cold": 59,
+        "bison_cold": 60,
         "other": 0
       },
       "mql": 21,
@@ -71,9 +71,9 @@
         "bison_cold": 5000,
         "other": 0
       },
-      "cpl": 169.4915254237288,
+      "cpl": 166.66666666666666,
       "cpl_to_mql": 476.1904761904762,
-      "mql_rate": 0.3559322033898305,
+      "mql_rate": 0.35,
       "sql_rate": 0.5238095238095238
     }
   ],
@@ -87,14 +87,14 @@
     },
     {
       "source": "bison_cold",
-      "leads": 80,
+      "leads": 81,
       "mql": 28,
       "sql": 12,
       "closed_won": 3
     }
   ],
   "funnel": {
-    "leads": 80,
+    "leads": 81,
     "mql": 28,
     "sql": 12,
     "closed_won": 3
@@ -121,6 +121,14 @@
     }
   ],
   "lead_log": [
+    {
+      "created_at": "2026-05-29T00:51:35.318000000Z",
+      "email_hash": "93f677e1-heri",
+      "source": "bison_cold",
+      "is_mql": false,
+      "is_sql": false,
+      "current_stage": "Gone Cold"
+    },
     {
       "created_at": "2026-05-28T18:36:08.403000000Z",
       "email_hash": "8f831099-leri",
@@ -512,15 +520,8 @@
       "is_mql": true,
       "is_sql": false,
       "current_stage": "Following Up"
-    },
-    {
-      "created_at": "2026-05-05T14:49:19.757000000Z",
-      "email_hash": "383de5ae-otte",
-      "source": "bison_cold",
-      "is_mql": false,
-      "is_sql": false,
-      "current_stage": "In Conversation"
     }
   ],
-  "stale": false
+  "stale": false,
+  "outreach": null
 }
