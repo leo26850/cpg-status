@@ -14,7 +14,7 @@ export function renderHtml(r: ReportData): string {
     : '';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-aesthetic="editorial">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +25,7 @@ export function renderHtml(r: ReportData): string {
 ${staleBanner}
 <section class="band-dark">
   <div class="container">
-    <span class="section-num">CPG Affiliate</span>
+    <span class="eyebrow">CPG Affiliate</span>
     <h1>Lead Funnel Report</h1>
     <p class="lede">Window: ${r.window.start} → ${r.window.end} · Generated ${r.generated_at.slice(0, 10)}</p>
   </div>
@@ -46,6 +46,27 @@ ${renderDefinitions()}
 </html>`;
 }
 
+function renderConversionRates(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
+  const f = r.funnel;
+  const leadToMql = f.leads > 0 ? f.mql / f.leads : null;
+  const mqlToSql = f.mql > 0 ? f.sql / f.mql : null;
+  const sqlToWon = f.sql > 0 ? f.closed_won / f.sql : null;
+  return `<div class="conv-grid">
+    <div class="conv-item">
+      <div class="conv-pct">${fmt(leadToMql, { pct: true })}</div>
+      <div class="conv-label">Lead → MQL</div>
+    </div>
+    <div class="conv-item">
+      <div class="conv-pct">${fmt(mqlToSql, { pct: true })}</div>
+      <div class="conv-label">MQL → SQL</div>
+    </div>
+    <div class="conv-item">
+      <div class="conv-pct">${fmt(sqlToWon, { pct: true })}</div>
+      <div class="conv-label">SQL → Closed Won</div>
+    </div>
+  </div>`;
+}
+
 function renderKpiBar(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
   const k = r.kpis;
   return `<section><div class="container">
@@ -57,6 +78,7 @@ function renderKpiBar(r: ReportData, fmt: (n: number | null, opts?: { currency?:
       <div class="stat"><div class="stat-num">${fmt(k.sql)}</div><div class="stat-label">SQL</div></div>
       <div class="stat"><div class="stat-num">${fmt(k.closed_won)}</div><div class="stat-label">Closed Won</div></div>
     </div>
+    ${renderConversionRates(r, fmt)}
   </div></section>`;
 }
 
@@ -80,6 +102,27 @@ function renderMonthlyTable(r: ReportData, fmt: (n: number | null, opts?: { curr
   </div></section>`;
 }
 
+function renderMomTrend(r: ReportData): string {
+  if (r.monthly.length < 2) return '';
+  const latest = r.monthly[r.monthly.length - 1];
+  const prior = r.monthly[r.monthly.length - 2];
+  if (prior.total_leads === 0) return '';
+  const delta = latest.total_leads - prior.total_leads;
+  const pct = ((delta / prior.total_leads) * 100).toFixed(0);
+  const isUp = delta >= 0;
+  const arrow = isUp ? '▲' : '▼';
+  const sign = isUp ? '+' : '';
+  return `<div class="trend-badge ${isUp ? 'up' : 'down'}">${arrow} ${sign}${pct}% MoM leads (${prior.month}: ${prior.total_leads} → ${latest.month}: ${latest.total_leads})</div>`;
+}
+
+function renderGadsCallout(r: ReportData): string {
+  const gads = r.by_source.find((s) => s.source === 'gads_lp');
+  if (!gads || gads.leads > 0) return '';
+  return `<div class="callout callout-warn">
+    <strong>Google Ads (gads_lp) shows 0 leads</strong> — known LP→Attio sync gap (15/35 form rows failed to sync), not a true zero. Funnel is currently bison_cold-only.
+  </div>`;
+}
+
 function renderBySource(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
   const rows = r.monthly.map((m) => `
     <tr>
@@ -91,6 +134,8 @@ function renderBySource(r: ReportData, fmt: (n: number | null, opts?: { currency
   return `<section><div class="container">
     <span class="section-num">04 · Source mix</span>
     <h2>Inbound leads by source</h2>
+    ${renderMomTrend(r)}
+    ${renderGadsCallout(r)}
     <div class="card"><canvas id="chart-by-source" height="340"></canvas></div>
     <table style="margin-top: 24px;">
       <thead><tr><th>Month</th><th>gads_lp</th><th>bison_cold</th><th>Total</th></tr></thead>
