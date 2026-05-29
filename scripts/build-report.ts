@@ -6,6 +6,8 @@ import { resolve } from 'node:path';
 import { aggregateMonthly, dedupLeads, toChannel, classifyMql, classifySql } from './compute/metrics.js';
 import { computeCohortCpa } from './compute/cohort.js';
 import { fetchAllRecords, attioString, attioTimestamp, attioStage } from './attio/client.js';
+import { fetchAllCampaigns } from './bison/client.js';
+import { aggregateOutreach } from './compute/outreach.js';
 import type { Channel, MonthlyCost, ReportData, LeadLogRow } from './compute/types.js';
 
 const PROJECT = 'cpg-data-warehouse';
@@ -265,6 +267,24 @@ async function main(): Promise<void> {
     closed_won,
   };
 
+  // Resilient Bison fetch — failure must NOT break the funnel report
+  let outreach: ReportData['outreach'] = null;
+  const bisonKey = process.env.BISON_API_KEY;
+  const bisonWorkspace = process.env.BISON_WORKSPACE_ID;
+  if (bisonKey && bisonWorkspace) {
+    try {
+      console.log('Fetching Bison campaigns...');
+      const bisonCampaigns = await fetchAllCampaigns(bisonKey, bisonWorkspace);
+      outreach = aggregateOutreach(bisonCampaigns);
+      console.log(`  → ${bisonCampaigns.length} campaigns | ${outreach.emails_sent} sent | reply rate ${outreach.reply_rate !== null ? (outreach.reply_rate * 100).toFixed(1) + '%' : '—'}`);
+    } catch (err) {
+      console.warn('[bison] fetch failed — outreach section will be hidden:', String((err as Error)?.message ?? err));
+      outreach = null;
+    }
+  } else {
+    console.warn('[bison] BISON_API_KEY or BISON_WORKSPACE_ID not set — skipping outreach section');
+  }
+
   const report: ReportData = {
     generated_at: new Date().toISOString(),
     window: windowRange,
@@ -277,6 +297,7 @@ async function main(): Promise<void> {
     cohort_cpa: cohort,
     lead_log,
     stale: false,
+    outreach,
   };
 
   writeFileSync('data/report.json', JSON.stringify(report, null, 2));

@@ -42,6 +42,8 @@ export type LeadLogRow = {
   current_stage: string;
 };
 
+export type { OutreachData, OutreachCampaignRow } from './outreach.js';
+
 export type ReportData = {
   generated_at: string;
   window: { start: string; end: string };
@@ -62,4 +64,5 @@ export type ReportData = {
   lead_log: LeadLogRow[];
   stale: boolean;
   stale_reason?: string;
+  outreach?: import('./outreach.js').OutreachData | null;
 };
