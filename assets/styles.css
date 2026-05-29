@@ -250,6 +250,8 @@ footer { padding: 40px 0; color: var(--text3); font-size: 0.85em; border-top: 1p
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .funnel-bar {
@@ -259,6 +261,7 @@ footer { padding: 40px 0; color: var(--text3); font-size: 0.85em; border-top: 1p
   align-items: center;
   justify-content: center;
   min-width: 48px;
+  flex-shrink: 0;
   transition: width 0.3s ease;
 }
 
@@ -267,6 +270,15 @@ footer { padding: 40px 0; color: var(--text3); font-size: 0.85em; border-top: 1p
   font-size: 1.05em;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.funnel-count-out {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
 .funnel-meta {
