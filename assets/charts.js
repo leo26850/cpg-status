@@ -2,15 +2,15 @@
 (function() {
   const data = JSON.parse(document.getElementById('report-data').textContent);
 
-  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.family = "'Outfit', system-ui, sans-serif";
   Chart.defaults.font.size = 12;
-  Chart.defaults.color = '#3F3F3F';
-  Chart.defaults.borderColor = '#E0E0E0';
+  Chart.defaults.color = '#71717a';
+  Chart.defaults.borderColor = '#27272a';
 
-  const ACCENT = '#F5A623';
-  const ACCENT_DIM = '#B27A18';
-  const BLUE = '#2563EB';
-  const GREEN = '#16A34A';
+  const ACCENT = '#f5a623';
+  const ACCENT_DIM = '#b27a18';
+  const BLUE = '#60a5fa';
+  const GREEN = '#22c55e';
 
   // 4.2 — Stacked bar by source (section 4)
   const bySourceCtx = document.getElementById('chart-by-source');
@@ -21,7 +21,7 @@
         labels: data.monthly.map(m => m.month),
         datasets: [
           { label: 'gads_lp', data: data.monthly.map(m => m.leads_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.leads_by_source.bison_cold), backgroundColor: '#60A5FA', borderRadius: 0 },
+          { label: 'bison_cold', data: data.monthly.map(m => m.leads_by_source.bison_cold), backgroundColor: BLUE, borderRadius: 0 },
         ],
       },
       options: {
@@ -29,7 +29,7 @@
         maintainAspectRatio: false,
         scales: {
           x: { stacked: true, grid: { display: false } },
-          y: { stacked: true, beginAtZero: true, max: 100, ticks: { stepSize: 10, precision: 0 }, grid: { color: '#E0E0E0' } },
+          y: { stacked: true, beginAtZero: true, max: 100, ticks: { stepSize: 10, precision: 0 }, grid: { color: '#27272a' } },
         },
         plugins: { legend: { position: 'bottom' } },
       },
@@ -55,7 +55,7 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        scales: { x: { beginAtZero: true, grid: { color: '#E0E0E0' } }, y: { grid: { display: false } } },
+        scales: { x: { beginAtZero: true, grid: { color: '#27272a' } }, y: { grid: { display: false } } },
         plugins: { legend: { display: false }, title: { display: true, text: 'Funnel' } },
       },
     });
@@ -70,13 +70,13 @@
         labels: data.monthly.map(m => m.month),
         datasets: [
           { label: 'gads_lp', data: data.monthly.map(m => m.mql_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.mql_by_source.bison_cold), backgroundColor: '#60A5FA', borderRadius: 0 },
+          { label: 'bison_cold', data: data.monthly.map(m => m.mql_by_source.bison_cold), backgroundColor: BLUE, borderRadius: 0 },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#E0E0E0' } } },
+        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#27272a' } } },
         plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'MQL by source' } },
       },
     });
@@ -113,7 +113,7 @@
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         scales: {
-          y: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Spend $' } },
+          y: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Spend $' }, grid: { color: '#27272a' } },
           y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Wins' } },
         },
         plugins: { legend: { position: 'bottom' } },
