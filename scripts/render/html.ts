@@ -1,5 +1,6 @@
 // scripts/render/html.ts
 import type { ReportData } from '../compute/types.js';
+import type { OutreachData } from '../compute/outreach.js';
 
 export function renderHtml(r: ReportData): string {
   const fmt = (n: number | null, opts?: { currency?: boolean; pct?: boolean }): string => {
@@ -33,6 +34,7 @@ ${staleBanner}
 
 ${renderKpiBar(r, fmt)}
 ${renderBySource(r, fmt)}
+${renderOutreach(r, fmt)}
 ${renderMql(r, fmt)}
 ${renderSql(r, fmt)}
 ${renderDefinitions()}
@@ -144,6 +146,40 @@ function renderBySource(r: ReportData, fmt: (n: number | null, opts?: { currency
   </div></section>`;
 }
 
+function renderOutreach(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
+  if (!r.outreach) return '';
+  const o = r.outreach as OutreachData;
+  const campaignRows = o.campaigns.map((c) => `
+    <tr>
+      <td>${c.name}</td>
+      <td><span class="tag${c.status === 'active' ? ' tag-green' : ' tag-outline'}">${c.status}</span></td>
+      <td>${fmt(c.emails_sent)}</td>
+      <td>${fmt(c.total_leads_contacted)}</td>
+      <td>${fmt(c.replied)}</td>
+      <td>${fmt(c.interested)}</td>
+      <td>${fmt(c.reply_rate, { pct: true })}</td>
+    </tr>`).join('');
+  return `<section><div class="container">
+    <span class="section-num">07 · Cold Email Outreach</span>
+    <h2>Cold email activity</h2>
+    <div class="metric-grid">
+      <div class="stat"><div class="stat-num">${fmt(o.emails_sent)}</div><div class="stat-label">Emails Sent</div></div>
+      <div class="stat"><div class="stat-num">${fmt(o.total_leads_contacted)}</div><div class="stat-label">Leads Contacted</div></div>
+      <div class="stat"><div class="stat-num">${fmt(o.reply_rate, { pct: true })}</div><div class="stat-label">Reply Rate</div></div>
+      <div class="stat"><div class="stat-num">${fmt(o.positive_reply_rate, { pct: true })}</div><div class="stat-label">Positive-Reply Rate</div></div>
+    </div>
+    <div class="card" style="margin-top: 24px; overflow-x: auto;">
+      <table>
+        <thead>
+          <tr><th>Campaign</th><th>Status</th><th>Sent</th><th>Contacted</th><th>Replied</th><th>Interested</th><th>Reply Rate</th></tr>
+        </thead>
+        <tbody>${campaignRows}</tbody>
+      </table>
+    </div>
+    <p style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">Open rate is not tracked — campaigns use plain-text sends with open tracking disabled.</p>
+  </div></section>`;
+}
+
 function renderMql(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
   const rows = r.monthly.map((m) => `
     <tr>
@@ -208,7 +244,7 @@ function renderCohort(r: ReportData, fmt: (n: number | null, opts?: { currency?:
 }
 
 function renderCpaPayback(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  void fmt;
+  void r; void fmt;
   return `<section><div class="container">
     <span class="section-num">08 · CPA & Payback</span>
     <h2>CPA by source + payback</h2>
@@ -249,3 +285,9 @@ function renderDefinitions(): string {
     <p style="margin-top: 24px; font-size: 0.85em; color: var(--muted);">Full rubric: <code>kamg-ops/clients/cpg-affiliate/metrics-rubric.md</code></p>
   </div></section>`;
 }
+
+// Suppress unused-function warnings for sections not yet wired into renderHtml
+void renderMonthlyTable;
+void renderCohort;
+void renderCpaPayback;
+void renderLeadLog;
