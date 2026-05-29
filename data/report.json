@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-29T01:34:37.852Z",
+  "generated_at": "2026-05-29T01:39:52.663Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-29"
@@ -523,5 +523,91 @@
     }
   ],
   "stale": false,
-  "outreach": null
+  "outreach": {
+    "emails_sent": 15542,
+    "total_leads_contacted": 7812,
+    "replied": 215,
+    "interested": 60,
+    "bounced": 116,
+    "unsubscribed": 0,
+    "active_campaigns": 3,
+    "campaign_count": 8,
+    "reply_rate": 0.027521761392729136,
+    "positive_reply_rate": 0.27906976744186046,
+    "bounce_rate": 0.007463646892291854,
+    "campaigns": [
+      {
+        "name": "20.05.26, US",
+        "status": "completed",
+        "emails_sent": 3795,
+        "total_leads_contacted": 1944,
+        "replied": 41,
+        "interested": 12,
+        "reply_rate": 0.02109053497942387
+      },
+      {
+        "name": "26.05.26, US",
+        "status": "active",
+        "emails_sent": 3035,
+        "total_leads_contacted": 1858,
+        "replied": 33,
+        "interested": 4,
+        "reply_rate": 0.01776103336921421
+      },
+      {
+        "name": "14.05.26, US",
+        "status": "completed",
+        "emails_sent": 2905,
+        "total_leads_contacted": 1493,
+        "replied": 34,
+        "interested": 9,
+        "reply_rate": 0.02277294038847957
+      },
+      {
+        "name": "04.05.26, US, C-level, health/wellness/care ind.",
+        "status": "active",
+        "emails_sent": 1985,
+        "total_leads_contacted": 733,
+        "replied": 30,
+        "interested": 8,
+        "reply_rate": 0.040927694406548434
+      },
+      {
+        "name": "28.04.26, US, C-level, health/wealth+",
+        "status": "active",
+        "emails_sent": 1643,
+        "total_leads_contacted": 590,
+        "replied": 43,
+        "interested": 20,
+        "reply_rate": 0.07288135593220339
+      },
+      {
+        "name": "11.05.26, US",
+        "status": "completed",
+        "emails_sent": 1278,
+        "total_leads_contacted": 653,
+        "replied": 21,
+        "interested": 4,
+        "reply_rate": 0.03215926493108729
+      },
+      {
+        "name": "13.05.26, US",
+        "status": "completed",
+        "emails_sent": 737,
+        "total_leads_contacted": 377,
+        "replied": 10,
+        "interested": 2,
+        "reply_rate": 0.026525198938992044
+      },
+      {
+        "name": "27.04.26, US, C-level, personalized",
+        "status": "paused",
+        "emails_sent": 164,
+        "total_leads_contacted": 164,
+        "replied": 3,
+        "interested": 1,
+        "reply_rate": 0.018292682926829267
+      }
+    ]
+  }
 }
