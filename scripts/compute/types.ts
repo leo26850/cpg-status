@@ -43,6 +43,7 @@ export type LeadLogRow = {
 };
 
 export type { OutreachData, OutreachCampaignRow } from './outreach.js';
+export type { CostsData, CostLineItem, PerMonthCost } from './costs.js';
 
 export type ReportData = {
   generated_at: string;
@@ -65,4 +66,5 @@ export type ReportData = {
   stale: boolean;
   stale_reason?: string;
   outreach?: import('./outreach.js').OutreachData | null;
+  costs?: import('./costs.js').CostsData | null;
 };

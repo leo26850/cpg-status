@@ -8,7 +8,8 @@ import { computeCohortCpa } from './compute/cohort.js';
 import { fetchAllRecords, attioString, attioTimestamp, attioStage } from './attio/client.js';
 import { fetchAllCampaigns } from './bison/client.js';
 import { aggregateOutreach } from './compute/outreach.js';
-import type { Channel, MonthlyCost, ReportData, LeadLogRow } from './compute/types.js';
+import { aggregateCosts } from './compute/costs.js';
+import type { Channel, MonthlyCost, ReportData, LeadLogRow, CostLineItem } from './compute/types.js';
 
 const PROJECT = 'cpg-data-warehouse';
 
@@ -285,6 +286,25 @@ async function main(): Promise<void> {
     console.warn('[bison] BISON_API_KEY or BISON_WORKSPACE_ID not set — skipping outreach section');
   }
 
+  // Resilient marketing cost model — failure must NOT break the funnel report
+  let costsData: ReportData['costs'] = null;
+  try {
+    const costsPath = resolve('data/marketing_costs.json');
+    const rawCosts = readFileSync(costsPath, 'utf-8').trim();
+    if (!rawCosts) throw new Error('marketing_costs.json is empty');
+    const costItems = JSON.parse(rawCosts) as CostLineItem[];
+    if (!Array.isArray(costItems)) throw new Error('marketing_costs.json must be a JSON array');
+    costsData = aggregateCosts(
+      costItems,
+      monthly.map((m) => ({ month: m.month, total_leads: m.total_leads })),
+      closed_won,
+    );
+    console.log(`[costs] ${costItems.length} line items | total $${costsData.total_cost} | blended CPL ${costsData.blended_cpl !== null ? '$' + costsData.blended_cpl.toFixed(2) : '—'} | blended CPA ${costsData.blended_cpa !== null ? '$' + costsData.blended_cpa.toFixed(2) : '—'}`);
+  } catch (err) {
+    console.warn('[costs] marketing_costs.json missing/invalid — cost section will be hidden:', String((err as Error)?.message ?? err));
+    costsData = null;
+  }
+
   const report: ReportData = {
     generated_at: new Date().toISOString(),
     window: windowRange,
@@ -298,6 +318,7 @@ async function main(): Promise<void> {
     lead_log,
     stale: false,
     outreach,
+    costs: costsData,
   };
 
   writeFileSync('data/report.json', JSON.stringify(report, null, 2));

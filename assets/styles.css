@@ -92,7 +92,7 @@ a:hover { color: var(--accent-hover); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.metric-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
 @media (max-width: 900px) {
   .grid-2, .grid-3, .grid-4, .metric-grid { grid-template-columns: 1fr; }
 }
