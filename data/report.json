@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-29T01:39:52.663Z",
+  "generated_at": "2026-05-29T03:08:38.278Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-05-29"
@@ -10,7 +10,7 @@
     "mql": 28,
     "sql": 12,
     "closed_won": 3,
-    "cpl": 166.66666666666666,
+    "cpl": null,
     "cpa": null
   },
   "monthly": [
@@ -65,14 +65,14 @@
         "negotiating": 0,
         "closed_won": 2
       },
-      "spend_total": 10000,
+      "spend_total": 0,
       "spend_by_source": {
-        "gads_lp": 5000,
-        "bison_cold": 5000,
+        "gads_lp": 0,
+        "bison_cold": 0,
         "other": 0
       },
-      "cpl": 166.66666666666666,
-      "cpl_to_mql": 476.1904761904762,
+      "cpl": null,
+      "cpl_to_mql": null,
       "mql_rate": 0.35,
       "sql_rate": 0.5238095238095238
     }
@@ -608,6 +608,42 @@
         "interested": 1,
         "reply_rate": 0.018292682926829267
       }
+    ]
+  },
+  "costs": {
+    "months": [
+      {
+        "month": "2026-04",
+        "total": 4000,
+        "items": [
+          {
+            "label": "KAMG service fee",
+            "amount": 4000
+          }
+        ],
+        "leads": 21,
+        "cpl": 190.47619047619048
+      },
+      {
+        "month": "2026-05",
+        "total": 4000,
+        "items": [
+          {
+            "label": "KAMG service fee",
+            "amount": 4000
+          }
+        ],
+        "leads": 60,
+        "cpl": 66.66666666666667
+      }
+    ],
+    "total_cost": 8000,
+    "total_leads": 81,
+    "closed_won": 3,
+    "blended_cpl": 98.76543209876543,
+    "blended_cpa": 2666.6666666666665,
+    "line_labels": [
+      "KAMG service fee"
     ]
   }
 }

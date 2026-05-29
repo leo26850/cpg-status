@@ -1,6 +1,6 @@
 # CPG Affiliate · 2026-05 · Lead Funnel
 
-_Generated 2026-05-29T01:39:52.663Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
+_Generated 2026-05-29T03:08:38.278Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
 
 ## Block 1 · Header strip
 
@@ -18,9 +18,9 @@ _Generated 2026-05-29T01:39:52.663Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 
 | Metric | Value |
 |---|---|
-| Total spend (fully-loaded) | $10,000 |
+| Total spend (fully-loaded) | $0 |
 | Leads (deduped) | 60 |
-| CPL | $167 |
+| CPL | — |
 
 ## Block 3 · Inbound leads by source
 
@@ -37,7 +37,7 @@ _Generated 2026-05-29T01:39:52.663Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 |---|---|
 | MQL (Booked Call stage) | 21 |
 | MQL rate | 35.0% |
-| CPL → MQL | $476 |
+| CPL → MQL | — |
 
 ## Block 5 · MQL by source
 
