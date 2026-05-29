@@ -34,6 +34,7 @@ ${staleBanner}
 </section>
 
 ${renderKpiBar(r, fmt)}
+${renderFunnel(r)}
 ${renderBySource(r, fmt)}
 ${renderOutreach(r, fmt)}
 ${renderMql(r, fmt)}
@@ -48,6 +49,54 @@ ${renderDefinitions()}
 <script src="assets/charts.js"></script>
 </body>
 </html>`;
+}
+
+function renderFunnel(r: ReportData): string {
+  const f = r.funnel;
+  if (!f || f.leads === 0) {
+    return `<section><div class="container">
+    <span class="section-num">03 · Funnel</span>
+    <h2>Lead → Closed drop-off</h2>
+    <p class="funnel-nodata">No lead data for this window.</p>
+  </div></section>`;
+  }
+
+  const stages = [
+    { name: 'Leads',      count: f.leads,      color: 'var(--accent)',     textColor: '#09090b' },
+    { name: 'MQL',        count: f.mql,         color: '#b27a18',           textColor: '#09090b' },
+    { name: 'SQL',        count: f.sql,         color: 'var(--blue)',       textColor: '#09090b' },
+    { name: 'Closed Won', count: f.closed_won,  color: 'var(--green)',      textColor: '#09090b' },
+  ] as const;
+
+  const MIN_WIDTH = 6;
+
+  const bars = stages.map((s, i) => {
+    const pctOfLeads = ((s.count / f.leads) * 100).toFixed(1);
+    const barWidth = Math.max(MIN_WIDTH, Math.round((s.count / f.leads) * 100));
+    let convLine = '';
+    if (i > 0) {
+      const prev = stages[i - 1];
+      const conv = prev.count > 0 ? ((s.count / prev.count) * 100).toFixed(1) : '—';
+      convLine = ` <span class="funnel-conv">· ${conv}% from ${prev.name}</span>`;
+    }
+    return `<div class="funnel-row">
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar" style="width:${barWidth}%;background:${s.color};">
+          <span class="funnel-count" style="color:${s.textColor};">${s.count}</span>
+        </div>
+      </div>
+      <div class="funnel-meta">
+        <span class="funnel-stage">${s.name}</span>
+        <span class="funnel-pct">${pctOfLeads}% of leads</span>${convLine}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<section><div class="container">
+    <span class="section-num">03 · Funnel</span>
+    <h2>Lead → Closed drop-off</h2>
+    <div class="funnel">${bars}</div>
+  </div></section>`;
 }
 
 function renderConversionRates(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
@@ -195,10 +244,7 @@ function renderMql(r: ReportData, fmt: (n: number | null, opts?: { currency?: bo
   return `<section><div class="container">
     <span class="section-num">05 · MQL</span>
     <h2>Marketing-qualified leads (Booked Call)</h2>
-    <div class="grid-2">
-      <div class="card"><canvas id="chart-funnel" height="180"></canvas></div>
-      <div class="card"><canvas id="chart-mql-by-source" height="180"></canvas></div>
-    </div>
+    <div class="card"><canvas id="chart-mql-by-source" height="180"></canvas></div>
     <table style="margin-top: 24px;">
       <thead><tr><th>Month</th><th>MQL (gads)</th><th>MQL (bison)</th><th>MQL Rate</th></tr></thead>
       <tbody>${rows}</tbody>

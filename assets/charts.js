@@ -8,7 +8,6 @@
   Chart.defaults.borderColor = '#27272a';
 
   const ACCENT = '#f5a623';
-  const ACCENT_DIM = '#b27a18';
   const BLUE = '#60a5fa';
   const GREEN = '#22c55e';
 
@@ -32,31 +31,6 @@
           y: { stacked: true, beginAtZero: true, max: 100, ticks: { stepSize: 10, precision: 0 }, grid: { color: '#27272a' } },
         },
         plugins: { legend: { position: 'bottom' } },
-      },
-    });
-  }
-
-  // 4.3 — Funnel (rendered as horizontal bar with custom labels) (section 5)
-  const funnelCtx = document.getElementById('chart-funnel');
-  if (funnelCtx) {
-    const f = data.funnel;
-    new Chart(funnelCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Leads', 'MQL', 'SQL', 'Closed Won'],
-        datasets: [{
-          label: 'Count',
-          data: [f.leads, f.mql, f.sql, f.closed_won],
-          backgroundColor: [ACCENT, ACCENT_DIM, BLUE, GREEN],
-          borderRadius: 0,
-        }],
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { x: { beginAtZero: true, grid: { color: '#27272a' } }, y: { grid: { display: false } } },
-        plugins: { legend: { display: false }, title: { display: true, text: 'Funnel' } },
       },
     });
   }
