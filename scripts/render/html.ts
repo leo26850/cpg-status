@@ -69,21 +69,23 @@ function renderFunnel(r: ReportData): string {
   ] as const;
 
   const MIN_WIDTH = 6;
+  const NARROW_THRESHOLD = 12; // bars under this width carry the count outside, to the right
 
   const bars = stages.map((s, i) => {
     const pctOfLeads = ((s.count / f.leads) * 100).toFixed(1);
     const barWidth = Math.max(MIN_WIDTH, Math.round((s.count / f.leads) * 100));
+    const isNarrow = barWidth < NARROW_THRESHOLD;
     let convLine = '';
     if (i > 0) {
       const prev = stages[i - 1];
       const conv = prev.count > 0 ? ((s.count / prev.count) * 100).toFixed(1) : '—';
       convLine = ` <span class="funnel-conv">· ${conv}% from ${prev.name}</span>`;
     }
+    const inBarCount = isNarrow ? '' : `<span class="funnel-count" style="color:${s.textColor};">${s.count}</span>`;
+    const outBarCount = isNarrow ? `<span class="funnel-count-out">${s.count}</span>` : '';
     return `<div class="funnel-row">
       <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:${barWidth}%;background:${s.color};">
-          <span class="funnel-count" style="color:${s.textColor};">${s.count}</span>
-        </div>
+        <div class="funnel-bar" style="width:${barWidth}%;background:${s.color};">${inBarCount}</div>${outBarCount}
       </div>
       <div class="funnel-meta">
         <span class="funnel-stage">${s.name}</span>
