@@ -335,13 +335,56 @@ function funnelPanel(r: ReportData): string {
 </section>`;
 }
 
+// ===== PANEL: TOTAL PIPELINE =====
+function totalPipelinePanel(r: ReportData): string {
+  const tp = r.total_pipeline;
+
+  if (!tp) {
+    return `<section class="panel" id="panel-totalpipeline" data-panel="totalpipeline">
+  <div class="panel-header">
+    <div class="panel-eyebrow">06 · Total Pipeline</div>
+    <h1>Total Pipeline</h1>
+  </div>
+  <div class="empty-state">Pipeline data not available.</div>
+</section>`;
+  }
+
+  const kpis = `<div class="kpi-grid">
+    ${kpi(fmtInt(tp.total), 'Total Deals',
+      'Every deal in Attio across all lead sources and all pipeline stages.')}
+    ${kpi(fmtInt(tp.open_active), 'Open / Active',
+      'Deals not yet at a terminal stage — Call Scheduled through Negotiating.')}
+    ${kpi(fmtInt(tp.closed_won), 'Closed Won',
+      'All deals marked Closed Won, regardless of lead source.')}
+    ${kpi(fmtPct(tp.close_rate), 'Close Rate',
+      'Closed Won ÷ (Closed Won + Closed Lost + Disqualified). Excludes still-open deals.')}
+  </div>`;
+
+  const stagesCard = card(
+    'Deals by Stage',
+    `<div style="position:relative;height:320px"><canvas id="chart-pipeline-stages"></canvas></div>`,
+    'Count of all deals at each pipeline stage. All lead sources included.'
+  );
+
+  return `<section class="panel" id="panel-totalpipeline" data-panel="totalpipeline">
+  <div class="panel-header">
+    <div class="panel-eyebrow">06 · Total Pipeline</div>
+    <h1>Total Pipeline</h1>
+    <p class="panel-desc">CPG's full sales pipeline across ALL lead sources, shown for context. The Overview, Channels, and Funnel panels are scoped to leads KAMG generated (Google Ads and cold email); this panel is everything.</p>
+    <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
+  </div>
+  ${kpis}
+  ${stagesCard}
+</section>`;
+}
+
 // ===== PANEL: METHODOLOGY =====
 function methodologyPanel(r: ReportData): string {
   const genDate = r.generated_at.slice(0, 10);
 
   return `<section class="panel" id="panel-methodology" data-panel="methodology">
   <div class="panel-header">
-    <div class="panel-eyebrow">06 · Methodology</div>
+    <div class="panel-eyebrow">07 · Methodology</div>
     <h1>How We Measure</h1>
     <p class="panel-desc">Definitions, channel rules, data sources, and refresh cadence — so every number in this report is auditable.</p>
     <p class="panel-freshness">Generated: ${r.generated_at}</p>
@@ -394,6 +437,11 @@ function methodologyPanel(r: ReportData): string {
     <p>Report as of: <code>${genDate}</code></p>
   </div>
 
+  <div class="card section-gap">
+    <h3>Scope Note: Total Pipeline vs KAMG Panels</h3>
+    <p>The <strong>Total Pipeline</strong> panel (06) shows CPG's complete Attio Deals object — all lead sources, all stages. Every other panel (Overview, Channels, Cold Email, Google Ads, Funnel) is scoped exclusively to leads KAMG generated via Google Ads (gads_lp) and cold email (bison_cold). Deals from organic, direct, referral, or other sources appear only in Total Pipeline.</p>
+  </div>
+
   <div class="callout info section-gap">
     <strong>Honest omissions:</strong> Pipeline revenue and deal value are not shown — the Attio Deals value field is unpopulated (0/200 deals have a value). Revenue metrics will be added once CPG's sales team records deal values at close. Google Ads exact spend and per-campaign detail arrive in Phase 2 when the Google Ads developer token is approved.
   </div>
@@ -411,12 +459,13 @@ export function renderHtml(r: ReportData): string {
   const reportMonth = windowEnd.slice(0, 7); // YYYY-MM
 
   const navItems = [
-    { id: 'overview',     label: 'Overview',          num: '01' },
-    { id: 'channels',     label: 'Channels',           num: '02' },
-    { id: 'coldemail',    label: 'Cold Email',         num: '03' },
-    { id: 'googleads',    label: 'Google Ads',         num: '04' },
-    { id: 'funnel',       label: 'Funnel & Conversion', num: '05' },
-    { id: 'methodology',  label: 'Methodology',        num: '06' },
+    { id: 'overview',       label: 'Overview',           num: '01' },
+    { id: 'channels',       label: 'Channels',            num: '02' },
+    { id: 'coldemail',      label: 'Cold Email',          num: '03' },
+    { id: 'googleads',      label: 'Google Ads',          num: '04' },
+    { id: 'funnel',         label: 'Funnel & Conversion',  num: '05' },
+    { id: 'totalpipeline',  label: 'Total Pipeline',       num: '06' },
+    { id: 'methodology',    label: 'Methodology',          num: '07' },
   ];
 
   const navButtons = navItems.map(({ id, label, num }) =>
@@ -444,6 +493,7 @@ export function renderHtml(r: ReportData): string {
   ${coldEmailPanel(r)}
   ${googleAdsPanel(r)}
   ${funnelPanel(r)}
+  ${totalPipelinePanel(r)}
   ${methodologyPanel(r)}
 </main>`;
 

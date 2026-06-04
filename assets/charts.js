@@ -17,8 +17,9 @@ window.CPGCharts = (function () {
   function ensure(panelId) {
     if (built.has(panelId)) return;
     built.add(panelId);
-    if (panelId === 'overview')   { buildFunnel(); buildBySource(); }
-    if (panelId === 'googleads')  { buildGadsTrend(); }
+    if (panelId === 'overview')       { buildFunnel(); buildBySource(); }
+    if (panelId === 'googleads')      { buildGadsTrend(); }
+    if (panelId === 'totalpipeline')  { buildPipelineStages(); }
   }
 
   // ===== OVERVIEW: Funnel horizontal bar =====
@@ -182,6 +183,65 @@ window.CPGCharts = (function () {
               text: 'Clicks',
               color: '#a1a1aa',
             },
+          },
+        },
+      },
+    });
+  }
+
+  // ===== TOTAL PIPELINE: Deals by stage horizontal bar =====
+  function buildPipelineStages() {
+    const ctx = document.getElementById('chart-pipeline-stages');
+    if (!ctx) return;
+    if (!data.total_pipeline) return;
+    const byStage = data.total_pipeline.by_stage;
+    const labels = byStage.map((r) => r.stage);
+    const counts = byStage.map((r) => r.count);
+
+    // Color each bar by stage category
+    const CLOSED_WON_COLOR   = '#34d399'; // green
+    const CLOSED_LOST_COLOR  = '#f87171'; // red
+    const DEFAULT_COLOR      = '#f5a623'; // amber
+    const closedLostSet = new Set(['Closed Lost', 'Disqualified']);
+
+    const colors = labels.map((l) => {
+      if (l === 'Closed Won')       return CLOSED_WON_COLOR;
+      if (closedLostSet.has(l))     return CLOSED_LOST_COLOR;
+      return DEFAULT_COLOR;
+    });
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Deals',
+          data: counts,
+          backgroundColor: colors,
+          borderWidth: 0,
+          borderRadius: 6,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.parsed.x.toLocaleString()} deals`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: GRID },
+            ticks: { precision: 0 },
+          },
+          y: {
+            grid: { display: false },
           },
         },
       },

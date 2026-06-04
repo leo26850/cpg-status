@@ -11,6 +11,7 @@ import { aggregateOutreach } from './compute/outreach.js';
 import { aggregateCosts } from './compute/costs.js';
 import { parseGoogleAdsCsv, aggregateGoogleAds } from './compute/googleAds.js';
 import { buildScorecard, computeConversionRates } from './compute/scorecard.js';
+import { aggregateTotalPipeline } from './compute/pipeline.js';
 import type { Channel, MonthlyCost, ReportData, LeadLogRow, CostLineItem } from './compute/types.js';
 
 const PROJECT = 'cpg-data-warehouse';
@@ -324,6 +325,10 @@ async function main(): Promise<void> {
   });
   const conversion_rates = computeConversionRates({ leads: total_leads, mql, sql, closed_won });
 
+  // --- Total Pipeline (all deals, all lead sources) ---
+  const allDealStages = deals.map((d) => d.stage).filter(Boolean);
+  const total_pipeline = aggregateTotalPipeline(allDealStages);
+
   const report: ReportData = {
     generated_at: new Date().toISOString(),
     window: windowRange,
@@ -341,6 +346,7 @@ async function main(): Promise<void> {
     google_ads: googleAds,
     scorecard,
     conversion_rates,
+    total_pipeline,
   };
 
   writeFileSync('data/report.json', JSON.stringify(report, null, 2));
