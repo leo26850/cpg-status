@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04T16:51:00.145Z",
+  "generated_at": "2026-06-04T17:29:30.158Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-06-04"
@@ -881,5 +881,50 @@
     "lead_to_mql": 0.301,
     "mql_to_sql": 0.419,
     "sql_to_won": 0.231
+  },
+  "total_pipeline": {
+    "by_stage": [
+      {
+        "stage": "Call Scheduled",
+        "count": 11
+      },
+      {
+        "stage": "Discovery Call Done",
+        "count": 68
+      },
+      {
+        "stage": "Follow Up Call Done",
+        "count": 51
+      },
+      {
+        "stage": "Following Up",
+        "count": 15
+      },
+      {
+        "stage": "Proposal Sent",
+        "count": 15
+      },
+      {
+        "stage": "Negotiating",
+        "count": 18
+      },
+      {
+        "stage": "Closed Won",
+        "count": 43
+      },
+      {
+        "stage": "Closed Lost",
+        "count": 8
+      },
+      {
+        "stage": "Disqualified",
+        "count": 6
+      }
+    ],
+    "total": 235,
+    "open_active": 178,
+    "closed_won": 43,
+    "closed_lost_dq": 14,
+    "close_rate": 0.7543859649122807
   }
 }

@@ -45,6 +45,21 @@ export type LeadLogRow = {
 export type { OutreachData, OutreachCampaignRow } from './outreach.js';
 export type { CostsData, CostLineItem, PerMonthCost } from './costs.js';
 
+// --- Total Pipeline (all lead sources, all stages) ---
+export type PipelineStageRow = {
+  stage: string;
+  count: number;
+};
+
+export type TotalPipeline = {
+  by_stage: PipelineStageRow[];
+  total: number;
+  open_active: number;
+  closed_won: number;
+  closed_lost_dq: number;
+  close_rate: number;
+};
+
 // --- Google Ads (Phase 1: account-level, from CSV; spend is ESTIMATED) ---
 export type GoogleAdsDaily = {
   date: string;        // ISO YYYY-MM-DD
@@ -114,4 +129,5 @@ export type ReportData = {
   google_ads?: GoogleAdsData | null;
   scorecard?: ScorecardRow[];
   conversion_rates?: ConversionRates;
+  total_pipeline?: TotalPipeline | null;
 };
