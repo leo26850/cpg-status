@@ -67,13 +67,13 @@ function overviewPanel(r: ReportData): string {
 
   const funnelCard = card(
     'Lead Funnel',
-    `<canvas id="chart-funnel" height="180"></canvas>`,
+    `<div style="position:relative;height:200px"><canvas id="chart-funnel"></canvas></div>`,
     'How leads move from first touch to closed deal — each bar is a funnel stage.'
   );
 
   const sourceCard = card(
     'Channel Split',
-    `<canvas id="chart-by-source" height="220"></canvas>`,
+    `<div style="position:relative;height:220px"><canvas id="chart-by-source"></canvas></div>`,
     'Share of leads by channel: Google Ads vs cold email outreach.'
   );
 
@@ -233,7 +233,7 @@ function googleAdsPanel(r: ReportData): string {
 
   const trendCard = card(
     'Daily Impressions & Clicks',
-    `<canvas id="chart-gads-trend" height="220"></canvas>`,
+    `<div style="position:relative;height:260px"><canvas id="chart-gads-trend"></canvas></div>`,
     'Daily impressions (left axis) and clicks (right axis) over the reporting window.'
   );
 
