@@ -7,6 +7,7 @@ export type CostLineItem = {
   month: string;   // YYYY-MM
   label: string;
   amount: number;
+  channel?: import('./types.js').Channel;   // optional: tags a cost to a channel for per-channel CPL
 };
 
 export type PerMonthCost = {
