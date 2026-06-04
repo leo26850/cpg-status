@@ -1,191 +1,203 @@
 <!DOCTYPE html>
-<html lang="en" data-aesthetic="editorial">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPG Affiliate — Lead Funnel</title>
+  <title>CPG Affiliate — ROI Report</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 
-<section class="band-dark">
-  <div class="container">
-    <span class="eyebrow">CPG Affiliate</span>
-    <h1>Lead Funnel Report</h1>
-    <p class="lede">Window: 2026-05-11 → 2026-05-31 · Generated 2026-05-31</p>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">CPG <span>×</span> KAMG</div>
+    <div class="report-month">2026-06</div>
+  </div>
+  <nav>
+    <button data-panel="overview"><span class="nav-num">01</span>Overview</button>
+      <button data-panel="channels"><span class="nav-num">02</span>Channels</button>
+      <button data-panel="coldemail"><span class="nav-num">03</span>Cold Email</button>
+      <button data-panel="googleads"><span class="nav-num">04</span>Google Ads</button>
+      <button data-panel="funnel"><span class="nav-num">05</span>Funnel & Conversion</button>
+      <button data-panel="methodology"><span class="nav-num">06</span>Methodology</button>
+  </nav>
+  <div class="sidebar-footer">
+    Generated 2026-06-04
+  </div>
+</aside>
+<main class="stage">
+  <section class="panel is-active" id="panel-overview" data-panel="overview">
+  <div class="panel-header">
+    <div class="panel-eyebrow">01 · Overview</div>
+    <h1>Results at a Glance</h1>
+    <p class="panel-desc">What KAMG delivered this period — leads generated, meetings booked, and deals closed across both channels.</p>
+    <p class="panel-freshness">Window: 2026-05-11 → 2026-06-04</p>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi">
+    <div class="kpi-value">103</div>
+    <div class="kpi-label">Leads Generated</div>
+    <p class="caption">Total inbound leads our campaigns generated this period.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">31</div>
+    <div class="kpi-label">Meetings Booked</div>
+    <p class="caption">Prospects who booked a discovery call — our Marketing Qualified Lead.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">3</div>
+    <div class="kpi-label">Deals Closed</div>
+    <p class="caption">Closed-won deals sourced from these campaigns.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">$258</div>
+    <div class="kpi-label">Cost per Meeting</div>
+    <p class="caption">Total marketing cost ÷ meetings booked. Blended across all channels.</p>
+  </div>
+  </div>
+  <div class="grid-2 section-gap">
+    <div class="card">
+    <h3>Lead Funnel</h3>
+    <div style="position:relative;height:200px"><canvas id="chart-funnel"></canvas></div>
+    <p class="card-caption">How leads move from first touch to closed deal — each bar is a funnel stage.</p>
+  </div>
+    <div class="card">
+    <h3>Channel Split</h3>
+    <div style="position:relative;height:220px"><canvas id="chart-by-source"></canvas></div>
+    <p class="card-caption">Share of leads by channel: Google Ads vs cold email outreach.</p>
+  </div>
   </div>
 </section>
-
-<section><div class="container">
-    <span class="section-num">02 · Headline</span>
-    <h2>Current month at a glance</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">84</div><div class="stat-label">Total Leads</div></div>
-      <div class="stat"><div class="stat-num">29</div><div class="stat-label">MQL</div></div>
-      <div class="stat"><div class="stat-num">13</div><div class="stat-label">SQL</div></div>
-      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Closed Won</div></div>
-      <div class="stat"><div class="stat-num">$95</div><div class="stat-label">CPL</div></div>
-      <div class="stat"><div class="stat-num">$2,667</div><div class="stat-label">CPA</div></div>
-    </div>
-    <div class="conv-grid">
-    <div class="conv-item">
-      <div class="conv-pct">34.5%</div>
-      <div class="conv-label">Lead → MQL</div>
-    </div>
-    <div class="conv-item">
-      <div class="conv-pct">44.8%</div>
-      <div class="conv-label">MQL → SQL</div>
-    </div>
-    <div class="conv-item">
-      <div class="conv-pct">23.1%</div>
-      <div class="conv-label">SQL → Closed Won</div>
+  <section class="panel" id="panel-channels" data-panel="channels">
+  <div class="panel-header">
+    <div class="panel-eyebrow">02 · Channels</div>
+    <h1>Channel Scorecard</h1>
+    <p class="panel-desc">How each acquisition channel is performing side by side — Google Ads (paid search) vs cold email outreach.</p>
+    <p class="panel-freshness">Window: 2026-05-11 → 2026-06-04</p>
+  </div>
+  <div class="channel-grid section-gap">
+    <div class="channel-card">
+      <div class="channel-card-name">Google Ads</div>
+      <div class="channel-card-sub">Paid search via Google Ads LP</div>
+      <ul class="channel-stat-list">
+        <li><span class="channel-stat-label">Leads</span><span class="channel-stat-value">11</span></li>
+        <li><span class="channel-stat-label">Meetings (MQL)</span><span class="channel-stat-value">0</span></li>
+        <li><span class="channel-stat-label">Proposals (SQL)</span><span class="channel-stat-value">0</span></li>
+        <li><span class="channel-stat-label">Deals Closed</span><span class="channel-stat-value">0</span></li>
+        <li><span class="channel-stat-label">Attributed Cost</span><span class="channel-stat-value">$2,531 <span class="tag-estimated">est.</span></span></li>
+        <li><span class="channel-stat-label">Cost per Lead</span><span class="channel-stat-value">$230 <span class="tag-estimated">est.</span></span></li>
+      </ul>
+      
+    </div><div class="channel-card">
+      <div class="channel-card-name">Cold Email</div>
+      <div class="channel-card-sub">Bison cold outreach engine</div>
+      <ul class="channel-stat-list">
+        <li><span class="channel-stat-label">Leads</span><span class="channel-stat-value">92</span></li>
+        <li><span class="channel-stat-label">Meetings (MQL)</span><span class="channel-stat-value">31</span></li>
+        <li><span class="channel-stat-label">Proposals (SQL)</span><span class="channel-stat-value">13</span></li>
+        <li><span class="channel-stat-label">Deals Closed</span><span class="channel-stat-value">3</span></li>
+        <li><span class="channel-stat-label">Attributed Cost</span><span class="channel-stat-value"><span style="color:var(--faint)">—</span></span></li>
+        <li><span class="channel-stat-label">Cost per Lead</span><span class="channel-stat-value"><span class="tag-muted">—</span></span></li>
+      </ul>
+      <p class="caption" style="margin-top:12px">Cost not attributed — blended cost shown in Funnel &amp; Conversion.</p>
     </div>
   </div>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">03 · Funnel</span>
-    <h2>Lead → Closed drop-off</h2>
-    <div class="funnel"><div class="funnel-row">
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:100%;background:var(--accent);"><span class="funnel-count" style="color:#09090b;">84</span></div>
-      </div>
-      <div class="funnel-meta">
-        <span class="funnel-stage">Leads</span>
-        <span class="funnel-pct">100.0% of leads</span>
-      </div>
-    </div><div class="funnel-row">
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:35%;background:#b27a18;"><span class="funnel-count" style="color:#09090b;">29</span></div>
-      </div>
-      <div class="funnel-meta">
-        <span class="funnel-stage">MQL</span>
-        <span class="funnel-pct">34.5% of leads</span> <span class="funnel-conv">· 34.5% from Leads</span>
-      </div>
-    </div><div class="funnel-row">
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:15%;background:var(--blue);"><span class="funnel-count" style="color:#09090b;">13</span></div>
-      </div>
-      <div class="funnel-meta">
-        <span class="funnel-stage">SQL</span>
-        <span class="funnel-pct">15.5% of leads</span> <span class="funnel-conv">· 44.8% from MQL</span>
-      </div>
-    </div><div class="funnel-row">
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:6%;background:var(--green);"></div><span class="funnel-count-out">3</span>
-      </div>
-      <div class="funnel-meta">
-        <span class="funnel-stage">Closed Won</span>
-        <span class="funnel-pct">3.6% of leads</span> <span class="funnel-conv">· 23.1% from SQL</span>
-      </div>
-    </div></div>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">04 · Source mix</span>
-    <h2>Inbound leads by source</h2>
-    <div class="trend-badge up">▲ +200% MoM leads (2026-04: 21 → 2026-05: 63)</div>
-    <div class="callout callout-warn">
-    <strong>Google Ads (gads_lp) shows 0 leads</strong> — known LP→Attio sync gap (15/35 form rows failed to sync), not a true zero. Funnel is currently bison_cold-only.
+</section>
+  <section class="panel" id="panel-coldemail" data-panel="coldemail">
+  <div class="panel-header">
+    <div class="panel-eyebrow">03 · Cold Email</div>
+    <h1>Cold Email Performance</h1>
+    <p class="panel-desc">Bison-powered outreach — the volume engine driving the majority of CPG leads today.</p>
+    <p class="panel-freshness">Window: 2026-05-11 → 2026-06-04</p>
   </div>
-    <div class="card"><canvas id="chart-by-source" height="340"></canvas></div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>gads_lp</th><th>bison_cold</th><th>Total</th></tr></thead>
-      <tbody>
-    <tr>
-      <td>2026-04</td>
-      <td>0</td>
-      <td>21</td>
-      <td>21</td>
-    </tr>
-    <tr>
-      <td>2026-05</td>
-      <td>0</td>
-      <td>63</td>
-      <td>63</td>
-    </tr></tbody>
-    </table>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">07 · Cold Email Outreach</span>
-    <h2>Cold email activity</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">16,400</div><div class="stat-label">Emails Sent</div></div>
-      <div class="stat"><div class="stat-num">8,061</div><div class="stat-label">Leads Contacted</div></div>
-      <div class="stat"><div class="stat-num">2.8%</div><div class="stat-label">Reply Rate</div></div>
-      <div class="stat"><div class="stat-num">27.2%</div><div class="stat-label">Positive-Reply Rate</div></div>
-    </div>
-    <div class="card" style="margin-top: 24px; overflow-x: auto;">
+  <div class="kpi-grid">
+    <div class="kpi">
+    <div class="kpi-value">17,622</div>
+    <div class="kpi-label">Emails Sent</div>
+    <p class="caption">Total cold emails delivered across all active campaigns.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">2.9%</div>
+    <div class="kpi-label">Reply Rate</div>
+    <p class="caption">Share of sends that received any reply from the prospect.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">64</div>
+    <div class="kpi-label">Interested Replies</div>
+    <p class="caption">Replies our team flagged as interested — warm leads.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">8,550</div>
+    <div class="kpi-label">Contacts Reached</div>
+    <p class="caption">Unique prospects contacted across all campaigns.</p>
+  </div>
+  </div>
+  <div class="card">
+    <h3>Campaigns by Interest</h3>
+    <div style="overflow-x:auto">
       <table>
         <thead>
-          <tr><th>Campaign</th><th>Status</th><th>Sent</th><th>Contacted</th><th>Replied</th><th>Interested</th><th>Reply Rate</th></tr>
+          <tr><th>Campaign</th><th>Status</th><th>Sent</th><th>Replied</th><th>Interested</th><th>Reply Rate</th></tr>
         </thead>
-        <tbody>
-    <tr>
+        <tbody><tr>
       <td>26.05.26, US</td>
-      <td><span class="tag tag-green">active</span></td>
-      <td>3,889</td>
-      <td>2,107</td>
-      <td>42</td>
-      <td>6</td>
-      <td>2.0%</td>
-    </tr>
-    <tr>
+      <td><span class="tag tag-outline">completed</span></td>
+      <td>4,157</td>
+      <td>44</td>
+      <td>7</td>
+      <td>2.1%</td>
+    </tr><tr>
       <td>20.05.26, US</td>
       <td><span class="tag tag-outline">completed</span></td>
       <td>3,795</td>
-      <td>1,944</td>
       <td>42</td>
       <td>12</td>
       <td>2.2%</td>
-    </tr>
-    <tr>
+    </tr><tr>
       <td>14.05.26, US</td>
       <td><span class="tag tag-outline">completed</span></td>
       <td>2,905</td>
-      <td>1,493</td>
       <td>34</td>
       <td>9</td>
       <td>2.3%</td>
-    </tr>
-    <tr>
+    </tr><tr>
       <td>04.05.26, US, C-level, health/wellness/care ind.</td>
       <td><span class="tag tag-green">active</span></td>
       <td>1,985</td>
-      <td>733</td>
-      <td>31</td>
+      <td>33</td>
       <td>8</td>
-      <td>4.2%</td>
-    </tr>
-    <tr>
+      <td>4.5%</td>
+    </tr><tr>
       <td>28.04.26, US, C-level, health/wealth+</td>
       <td><span class="tag tag-green">active</span></td>
-      <td>1,647</td>
-      <td>590</td>
+      <td>1,661</td>
       <td>43</td>
       <td>20</td>
       <td>7.3%</td>
-    </tr>
-    <tr>
+    </tr><tr>
       <td>11.05.26, US</td>
       <td><span class="tag tag-outline">completed</span></td>
       <td>1,278</td>
-      <td>653</td>
-      <td>22</td>
+      <td>23</td>
       <td>4</td>
-      <td>3.4%</td>
-    </tr>
-    <tr>
+      <td>3.5%</td>
+    </tr><tr>
+      <td>01.06.26, US</td>
+      <td><span class="tag tag-outline">completed</span></td>
+      <td>940</td>
+      <td>12</td>
+      <td>1</td>
+      <td>2.5%</td>
+    </tr><tr>
       <td>13.05.26, US</td>
       <td><span class="tag tag-outline">completed</span></td>
       <td>737</td>
-      <td>377</td>
-      <td>11</td>
+      <td>13</td>
       <td>2</td>
-      <td>2.9%</td>
-    </tr>
-    <tr>
+      <td>3.4%</td>
+    </tr><tr>
       <td>27.04.26, US, C-level, personalized</td>
       <td><span class="tag tag-outline">paused</span></td>
-      <td>164</td>
       <td>164</td>
       <td>3</td>
       <td>1</td>
@@ -193,103 +205,185 @@
     </tr></tbody>
       </table>
     </div>
-    <p style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">Open rate is not tracked — campaigns use plain-text sends with open tracking disabled.</p>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">05 · MQL</span>
-    <h2>Marketing-qualified leads (Booked Call)</h2>
-    <div class="card"><canvas id="chart-mql-by-source" height="180"></canvas></div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>MQL (gads)</th><th>MQL (bison)</th><th>MQL Rate</th></tr></thead>
-      <tbody>
-    <tr>
-      <td>2026-04</td>
-      <td>0</td>
-      <td>7</td>
-      <td>33.3%</td>
-    </tr>
-    <tr>
-      <td>2026-05</td>
-      <td>0</td>
-      <td>22</td>
-      <td>34.9%</td>
-    </tr></tbody>
-    </table>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">06 · SQL</span>
-    <h2>Sales-qualified deals (Proposal Sent · Negotiating · Closed Won)</h2>
-    <div class="grid-2">
-      <div class="card"><canvas id="chart-sql-donut" height="180"></canvas></div>
-      <div class="card">
-        <h3>Current month split</h3>
-        <p><span class="tag">Proposal Sent</span> 10</p>
-        <p><span class="tag tag-blue">Negotiating</span> 0</p>
-        <p><span class="tag tag-green">Closed Won</span> 3</p>
+    <p class="card-caption">Open rate is not tracked — campaigns use plain-text sends with open tracking disabled.</p>
+  </div>
+</section>
+  <section class="panel" id="panel-googleads" data-panel="googleads">
+  <div class="panel-header">
+    <div class="panel-eyebrow">04 · Google Ads</div>
+    <h1>Google Ads Performance</h1>
+    <p class="panel-desc">Account-level paid search performance for the period 2026-05-16 → 2026-06-02. This is Phase 1 (CSV-based); live API data arrives in Phase 2.</p>
+    <p class="panel-freshness">Ads data window: 2026-05-16 → 2026-06-02</p>
+  </div>
+  <div class="callout info section-gap">
+    Google Ads is a new, ramping channel — live since mid-May 2026. Spend is estimated from clicks × average CPC (the export has no exact cost column). Exact spend and per-campaign breakdown arrive once the Google Ads developer token is approved (Phase 2).
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi">
+    <div class="kpi-value">25,158</div>
+    <div class="kpi-label">Impressions</div>
+    <p class="caption">Total times our ads were shown to searchers in this window.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">1,036</div>
+    <div class="kpi-label">Clicks</div>
+    <p class="caption">Number of clicks through to the landing page.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">4.1%</div>
+    <div class="kpi-label">Click-Through Rate</div>
+    <p class="caption">Clicks ÷ impressions. Measures how compelling our ad copy is.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">$2.44</div>
+    <div class="kpi-label">Avg. CPC</div>
+    <p class="caption">Average cost per click — estimated from clicks × avg CPC in export.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">2</div>
+    <div class="kpi-label">Conversions</div>
+    <p class="caption">Form submissions tracked by Google — reconciles with gads_lp leads in Attio.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">$2,531 <span class="tag-estimated">estimated</span></div>
+    <div class="kpi-label">Est. Spend</div>
+    <p class="caption">Derived as Σ daily clicks × avg CPC. The export has no exact cost column.</p>
+  </div>
+    <div class="kpi">
+    <div class="kpi-value">$1,265 <span class="tag-estimated">estimated</span></div>
+    <div class="kpi-label">Est. Cost / Conversion</div>
+    <p class="caption">Estimated spend ÷ conversions. Will sharpen as volume grows.</p>
+  </div>
+  </div>
+  <div class="card">
+    <h3>Daily Impressions & Clicks</h3>
+    <div style="position:relative;height:260px"><canvas id="chart-gads-trend"></canvas></div>
+    <p class="card-caption">Daily impressions (left axis) and clicks (right axis) over the reporting window.</p>
+  </div>
+</section>
+  <section class="panel" id="panel-funnel" data-panel="funnel">
+  <div class="panel-header">
+    <div class="panel-eyebrow">05 · Funnel &amp; Conversion</div>
+    <h1>Funnel Breakdown</h1>
+    <p class="panel-desc">Full funnel with stage-by-stage conversion rates and blended cost efficiency metrics.</p>
+    <p class="panel-freshness">Window: 2026-05-11 → 2026-06-04</p>
+  </div>
+  <div class="grid-2 section-gap">
+    <div class="card">
+    <h3>Funnel Stages</h3>
+    <div class="funnel-stages"><div class="funnel-stage-row">
+      <div class="funnel-stage-num" style="color:var(--accent)">103</div>
+      <div class="funnel-stage-info">
+        <div class="funnel-stage-name">Leads</div>
+        <div class="funnel-stage-sub">All inbound leads from campaigns</div>
+      </div>
+    </div><div class="funnel-arrow">↓ <span class="funnel-rate-chip">30.1% Lead → MQL</span></div><div class="funnel-stage-row">
+      <div class="funnel-stage-num" style="color:var(--blue)">31</div>
+      <div class="funnel-stage-info">
+        <div class="funnel-stage-name">MQL</div>
+        <div class="funnel-stage-sub">Booked a discovery call</div>
+      </div>
+    </div><div class="funnel-arrow">↓ <span class="funnel-rate-chip">41.9% MQL → SQL</span></div><div class="funnel-stage-row">
+      <div class="funnel-stage-num" style="color:var(--green)">13</div>
+      <div class="funnel-stage-info">
+        <div class="funnel-stage-name">SQL</div>
+        <div class="funnel-stage-sub">Reached Proposal Sent or later</div>
+      </div>
+    </div><div class="funnel-arrow">↓ <span class="funnel-rate-chip">23.1% SQL → Closed Won</span></div><div class="funnel-stage-row">
+      <div class="funnel-stage-num" style="color:#a78bfa">3</div>
+      <div class="funnel-stage-info">
+        <div class="funnel-stage-name">Closed Won</div>
+        <div class="funnel-stage-sub">Deal closed</div>
+      </div>
+    </div></div>
+    <p class="card-caption">Stage-by-stage counts with the conversion rate between each adjacent stage.</p>
+  </div>
+    <div class="card">
+    <h3>Blended Efficiency</h3>
+    <div class="kpi-grid" style="gap:12px;margin-bottom:0">
+      <div class="kpi">
+        <div class="kpi-value">$87</div>
+        <div class="kpi-label">Blended CPL</div>
+        <p class="caption">Total marketing cost ÷ total leads. Across all channels.</p>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">$2,667</div>
+        <div class="kpi-label">Blended CPA</div>
+        <p class="caption">Total marketing cost ÷ closed-won deals.</p>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">$8,000</div>
+        <div class="kpi-label">Total Spend</div>
+        <p class="caption">KAMG service fee included. Google Ads ad spend tracked separately.</p>
       </div>
     </div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>Proposal Sent</th><th>Negotiating</th><th>Closed Won</th><th>SQL Rate</th></tr></thead>
-      <tbody>
-    <tr>
-      <td>2026-04</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>14.3%</td>
-    </tr>
-    <tr>
-      <td>2026-05</td>
-      <td>10</td>
-      <td>0</td>
-      <td>2</td>
-      <td>54.5%</td>
-    </tr></tbody>
-    </table>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">08 · Spend &amp; Efficiency</span>
-    <h2>Cost per lead &amp; acquisition</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">$8,000</div><div class="stat-label">Total Spend</div></div>
-      <div class="stat"><div class="stat-num">$95</div><div class="stat-label">Blended CPL</div></div>
-      <div class="stat"><div class="stat-num">$2,667</div><div class="stat-label">Blended CPA</div></div>
-    </div>
-    <div class="card" style="margin-top: 24px; overflow-x: auto;">
-      <table>
-        <thead><tr><th>Month</th><th>Spend</th><th>Leads</th><th>CPL</th></tr></thead>
-        <tbody>
-    <tr>
-      <td>2026-04</td>
-      <td>$4,000</td>
-      <td>21</td>
-      <td>$190</td>
-    </tr>
-    <tr>
-      <td>2026-05</td>
-      <td>$4,000</td>
-      <td>63</td>
-      <td>$63</td>
-    </tr></tbody>
-      </table>
-    </div>
-    <p style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">Included: KAMG service fee. Google Ads and Attio line items will be added as costs are confirmed.</p>
-  </div></section>
-<section><div class="container">
-    <span class="section-num">10 · Definitions</span>
-    <h2>How these metrics are defined</h2>
-    <div class="grid-2">
-      <div class="card"><h4>MQL</h4><p>Lead has reached Attio Leads stage <code>Booked Call</code>. CPG-specific override of the SOP-generic Fit+Intent ≥ 60.</p></div>
-      <div class="card"><h4>SQL</h4><p>Deal has reached <code>Proposal Sent</code>, <code>Negotiating</code>, or <code>Closed Won</code>. CPG-specific override of the SOP-generic BANT-lite.</p></div>
-    </div>
-    <p style="margin-top: 16px; font-size: 0.85em; color: var(--muted);">Funnel counts in-scope channels only — Google Ads (<code>gads_lp</code>) and bison cold email (<code>bison_cold</code>). Contacts from other sources are excluded.</p>
-    <p style="margin-top: 24px; font-size: 0.85em; color: var(--muted);">Full rubric: <code>kamg-ops/clients/cpg-affiliate/metrics-rubric.md</code></p>
-  </div></section>
+    <p class="card-caption">Blended across all channels — total marketing cost ÷ leads (CPL) and ÷ closed deals (CPA). Google Ads spend is estimated.</p>
+  </div>
+  </div>
+</section>
+  <section class="panel" id="panel-methodology" data-panel="methodology">
+  <div class="panel-header">
+    <div class="panel-eyebrow">06 · Methodology</div>
+    <h1>How We Measure</h1>
+    <p class="panel-desc">Definitions, channel rules, data sources, and refresh cadence — so every number in this report is auditable.</p>
+    <p class="panel-freshness">Generated: 2026-06-04T16:30:04.782Z</p>
+  </div>
 
-<footer><div class="container">Generated by <code>cpg-status</code> · 2026-05-31T08:36:43.398Z</div></footer>
+  <div class="card section-gap">
+    <h3>Definitions</h3>
+    <div class="method-grid">
+      <div class="method-item">
+        <h4>Lead</h4>
+        <p>Any contact who submitted the CPG landing-page form or was created in the Attio Leads object via the Bison reply webhook. Raw count, no qualification filter.</p>
+      </div>
+      <div class="method-item">
+        <h4>MQL — Marketing Qualified Lead</h4>
+        <p>Lead has reached Attio Leads stage <code>Booked Call</code>. Represents a booked discovery call with the CPG sales team.</p>
+      </div>
+      <div class="method-item">
+        <h4>SQL — Sales Qualified Lead</h4>
+        <p>Deal object has reached <code>Proposal Sent</code>, <code>Negotiating</code>, or <code>Closed Won</code> stage in Attio Deals.</p>
+      </div>
+      <div class="method-item">
+        <h4>Closed Won</h4>
+        <p>Deal at <code>Closed Won</code> stage. Counts only deals whose linked person matches a known lead source.</p>
+      </div>
+    </div>
+  </div>
 
-<script id="report-data" type="application/json">{"generated_at":"2026-05-31T08:36:43.398Z","window":{"start":"2026-05-11","end":"2026-05-31"},"launch_date":"2026-05-11","kpis":{"total_leads":84,"mql":29,"sql":13,"closed_won":3,"cpl":null,"cpa":null},"monthly":[{"month":"2026-04","total_leads":21,"leads_by_source":{"gads_lp":0,"bison_cold":21,"other":0},"mql":7,"mql_by_source":{"gads_lp":0,"bison_cold":7,"other":0},"sql":1,"sql_stage_split":{"proposal_sent":0,"negotiating":0,"closed_won":1},"spend_total":4000,"spend_by_source":{"gads_lp":0,"bison_cold":4000,"other":0},"cpl":190.47619047619048,"cpl_to_mql":571.4285714285714,"mql_rate":0.3333333333333333,"sql_rate":0.14285714285714285},{"month":"2026-05","total_leads":63,"leads_by_source":{"gads_lp":0,"bison_cold":63,"other":0},"mql":22,"mql_by_source":{"gads_lp":0,"bison_cold":22,"other":0},"sql":12,"sql_stage_split":{"proposal_sent":10,"negotiating":0,"closed_won":2},"spend_total":0,"spend_by_source":{"gads_lp":0,"bison_cold":0,"other":0},"cpl":null,"cpl_to_mql":null,"mql_rate":0.3492063492063492,"sql_rate":0.5454545454545454}],"by_source":[{"source":"gads_lp","leads":0,"mql":0,"sql":0,"closed_won":0},{"source":"bison_cold","leads":84,"mql":29,"sql":13,"closed_won":3}],"funnel":{"leads":84,"mql":29,"sql":13,"closed_won":3},"sql_stage_split":{"proposal_sent":10,"negotiating":0,"closed_won":3},"cohort_cpa":[{"cohort_month":"2026-04","spend_n_minus_3":null,"wins":1,"cpa":null,"insufficient_data":true},{"cohort_month":"2026-05","spend_n_minus_3":null,"wins":2,"cpa":null,"insufficient_data":true}],"lead_log":[{"created_at":"2026-05-30T18:33:19.817000000Z","email_hash":"28e9c389-nina","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-29T20:20:12.509000000Z","email_hash":"620d4faa-gail","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-29T15:46:17.888000000Z","email_hash":"eac9efbc-onms","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-29T00:51:35.318000000Z","email_hash":"93f677e1-heri","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-28T18:36:08.403000000Z","email_hash":"8f831099-leri","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-28T12:05:00.580000000Z","email_hash":"4542d056-sd","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-28T04:12:29.363000000Z","email_hash":"5312eb4f-idan","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Discovery Call Done"},{"created_at":"2026-05-27T22:25:57.621000000Z","email_hash":"7b9f84b3-llin","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-27T18:38:21.582000000Z","email_hash":"27546ad7-zach","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-27T14:00:02.270000000Z","email_hash":"88a67303-nell","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-26T21:44:50.533000000Z","email_hash":"b512a0ba-.jit","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-26T21:21:51.614000000Z","email_hash":"017af642-bea","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T20:12:36.000000000Z","email_hash":"14830a15-elle","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-22T18:27:31.514000000Z","email_hash":"56b8f638-team","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-22T15:26:41.313000000Z","email_hash":"d0872424-wski","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T10:58:56.177000000Z","email_hash":"f4ecea4b-acky","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T01:26:33.532000000Z","email_hash":"1553671c-abhi","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-21T15:45:18.418000000Z","email_hash":"d27480b9-eric","source":"other","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-20T21:56:49.134000000Z","email_hash":"0139e298-dawn","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-20T20:46:27.802000000Z","email_hash":"b6180fff-nise","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-20T19:42:26.561000000Z","email_hash":"36cf6cac-ajia","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-20T06:48:02.287000000Z","email_hash":"c97be7dc-udev","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T16:22:22.660000000Z","email_hash":"d370f156-ermo","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Closed Won"},{"created_at":"2026-05-19T15:43:35.804000000Z","email_hash":"90539812-aron","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T00:39:28.543000000Z","email_hash":"1b019115-viad","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-19T00:39:20.425000000Z","email_hash":"367b0f87-hase","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T00:39:16.723000000Z","email_hash":"250b1933-ylor","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-19T00:39:12.215000000Z","email_hash":"f2134292-ward","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-18T19:08:45.951000000Z","email_hash":"2dcc3cd4-erra","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-18T15:46:55.658000000Z","email_hash":"9e0c8712-5421","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Following Up"},{"created_at":"2026-05-17T16:55:43.501000000Z","email_hash":"f348bbf5-nnah","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-12T19:50:43.501000000Z","email_hash":"c0ead8f1-hron","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-12T19:24:39.995000000Z","email_hash":"ab5508ce-emi","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-12T19:02:11.714000000Z","email_hash":"87aa74f4-kate","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Closed Lost"},{"created_at":"2026-05-12T18:38:22.213000000Z","email_hash":"71748e0d-andy","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-12T18:37:44.564000000Z","email_hash":"260f8293-fice","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-12T18:37:39.384000000Z","email_hash":"1362d185-dney","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-12T18:37:32.741000000Z","email_hash":"8c870ff7-aren","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-12T18:37:28.711000000Z","email_hash":"87f45d09-jeff","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-05-12T15:46:08.498000000Z","email_hash":"82f73ec7-rob","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-08T19:51:27.314000000Z","email_hash":"38bf7f28-ason","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-08T18:56:20.304000000Z","email_hash":"f6c0ec03-ty","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-08T01:01:40.251000000Z","email_hash":"c981d404-rtha","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-08T00:00:48.814000000Z","email_hash":"4a4783a1-dsey","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-07T20:32:11.639000000Z","email_hash":"1e0ac8a9-ivy","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-07T16:59:32.084000000Z","email_hash":"4df396f2-ryan","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-06T16:01:05.120000000Z","email_hash":"00c78c21-onio","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-06T15:30:22.518000000Z","email_hash":"1e84da21-mrmn","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-06T02:56:45.245000000Z","email_hash":"5cb62313-mour","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-05T19:20:52.368000000Z","email_hash":"c5455df6-each","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"}],"stale":false,"outreach":{"emails_sent":16400,"total_leads_contacted":8061,"replied":228,"interested":62,"bounced":119,"unsubscribed":0,"active_campaigns":3,"campaign_count":8,"reply_rate":0.02828433196873837,"positive_reply_rate":0.2719298245614035,"bounce_rate":0.00725609756097561,"campaigns":[{"name":"26.05.26, US","status":"active","emails_sent":3889,"total_leads_contacted":2107,"replied":42,"interested":6,"reply_rate":0.019933554817275746},{"name":"20.05.26, US","status":"completed","emails_sent":3795,"total_leads_contacted":1944,"replied":42,"interested":12,"reply_rate":0.021604938271604937},{"name":"14.05.26, US","status":"completed","emails_sent":2905,"total_leads_contacted":1493,"replied":34,"interested":9,"reply_rate":0.02277294038847957},{"name":"04.05.26, US, C-level, health/wellness/care ind.","status":"active","emails_sent":1985,"total_leads_contacted":733,"replied":31,"interested":8,"reply_rate":0.04229195088676671},{"name":"28.04.26, US, C-level, health/wealth+","status":"active","emails_sent":1647,"total_leads_contacted":590,"replied":43,"interested":20,"reply_rate":0.07288135593220339},{"name":"11.05.26, US","status":"completed","emails_sent":1278,"total_leads_contacted":653,"replied":22,"interested":4,"reply_rate":0.033690658499234305},{"name":"13.05.26, US","status":"completed","emails_sent":737,"total_leads_contacted":377,"replied":11,"interested":2,"reply_rate":0.029177718832891247},{"name":"27.04.26, US, C-level, personalized","status":"paused","emails_sent":164,"total_leads_contacted":164,"replied":3,"interested":1,"reply_rate":0.018292682926829267}]},"costs":{"months":[{"month":"2026-04","total":4000,"items":[{"label":"KAMG service fee","amount":4000}],"leads":21,"cpl":190.47619047619048},{"month":"2026-05","total":4000,"items":[{"label":"KAMG service fee","amount":4000}],"leads":63,"cpl":63.492063492063494}],"total_cost":8000,"total_leads":84,"closed_won":3,"blended_cpl":95.23809523809524,"blended_cpa":2666.6666666666665,"line_labels":["KAMG service fee"]}}</script>
+  <div class="card section-gap">
+    <h3>Channel Attribution Rules</h3>
+    <ul class="source-list">
+      <li><strong>gads_lp</strong> — lead_source = <code>gads_lp</code> in Attio. Set by the LP webhook when UTM source contains "google" or medium is "cpc".</li>
+      <li><strong>bison_cold</strong> — lead_source = <code>bison_cold</code>. Set when a Bison reply triggers lead creation via webhook.</li>
+      <li><strong>other</strong> — all remaining leads not matching the two above rules. Excluded from channel scorecard CPL.</li>
+    </ul>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Data Sources</h3>
+    <ul class="source-list">
+      <li><strong>Leads &amp; Deals</strong> — Attio live API (workspace: cpg-affiliate-partners). Pulled at build time via authenticated REST calls.</li>
+      <li><strong>Cold Email Metrics</strong> — Bison <code>/campaigns</code> endpoint. Sends, replied, interested per campaign. Open-rate not tracked (plain-text sends).</li>
+      <li><strong>Google Ads (Phase 1)</strong> — Account-level daily CSV export (<code>data/google_ads_export.csv</code>). Columns: Date, Clicks, Impressions, Avg. CPC, Conversions. Spend is derived (Σ clicks × avg CPC) and labeled <span class="tag-estimated">estimated</span>. No campaign-level breakdown in Phase 1.</li>
+      <li><strong>Cost Model</strong> — <code>data/marketing_costs.json</code> line items. Currently includes KAMG service fee. Google Ads exact spend will be added in Phase 2.</li>
+    </ul>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Refresh Cadence</h3>
+    <p style="margin-bottom:8px">This report rebuilds automatically on a <strong>weekly schedule</strong> via a GitHub Actions workflow. The compute layer fetches live data from Attio and Bison at build time — no manual HTML editing required.</p>
+    <p>Report as of: <code>2026-06-04</code></p>
+  </div>
+
+  <div class="callout info section-gap">
+    <strong>Honest omissions:</strong> Pipeline revenue and deal value are not shown — the Attio Deals value field is unpopulated (0/200 deals have a value). Revenue metrics will be added once CPG's sales team records deal values at close. Google Ads exact spend and per-campaign detail arrive in Phase 2 when the Google Ads developer token is approved.
+  </div>
+</section>
+</main>
+<script id="report-data" type="application/json">{"generated_at":"2026-06-04T16:30:04.782Z","window":{"start":"2026-05-11","end":"2026-06-04"},"launch_date":"2026-05-11","kpis":{"total_leads":103,"mql":31,"sql":13,"closed_won":3,"cpl":null,"cpa":null},"monthly":[{"month":"2026-04","total_leads":21,"leads_by_source":{"gads_lp":0,"bison_cold":21,"other":0},"mql":7,"mql_by_source":{"gads_lp":0,"bison_cold":7,"other":0},"sql":1,"sql_stage_split":{"proposal_sent":0,"negotiating":0,"closed_won":1},"spend_total":4000,"spend_by_source":{"gads_lp":0,"bison_cold":4000,"other":0},"cpl":190.47619047619048,"cpl_to_mql":571.4285714285714,"mql_rate":0.3333333333333333,"sql_rate":0.14285714285714285},{"month":"2026-05","total_leads":71,"leads_by_source":{"gads_lp":2,"bison_cold":69,"other":0},"mql":24,"mql_by_source":{"gads_lp":0,"bison_cold":24,"other":0},"sql":12,"sql_stage_split":{"proposal_sent":10,"negotiating":0,"closed_won":2},"spend_total":0,"spend_by_source":{"gads_lp":0,"bison_cold":0,"other":0},"cpl":null,"cpl_to_mql":null,"mql_rate":0.3380281690140845,"sql_rate":0.5},{"month":"2026-06","total_leads":11,"leads_by_source":{"gads_lp":9,"bison_cold":2,"other":0},"mql":0,"mql_by_source":{"gads_lp":0,"bison_cold":0,"other":0},"sql":0,"sql_stage_split":{"proposal_sent":0,"negotiating":0,"closed_won":0},"spend_total":0,"spend_by_source":{"gads_lp":0,"bison_cold":0,"other":0},"cpl":null,"cpl_to_mql":null,"mql_rate":0,"sql_rate":null}],"by_source":[{"source":"gads_lp","leads":11,"mql":0,"sql":0,"closed_won":0},{"source":"bison_cold","leads":92,"mql":31,"sql":13,"closed_won":3}],"funnel":{"leads":103,"mql":31,"sql":13,"closed_won":3},"sql_stage_split":{"proposal_sent":10,"negotiating":0,"closed_won":3},"cohort_cpa":[{"cohort_month":"2026-04","spend_n_minus_3":null,"wins":1,"cpa":null,"insufficient_data":true},{"cohort_month":"2026-05","spend_n_minus_3":null,"wins":2,"cpa":null,"insufficient_data":true},{"cohort_month":"2026-06","spend_n_minus_3":null,"wins":0,"cpa":null,"insufficient_data":true}],"lead_log":[{"created_at":"2026-06-03T23:48:04.472000000Z","email_hash":"008c5255-moke","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:47:58.451000000Z","email_hash":"9e0db254-moke","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:47:53.754000000Z","email_hash":"7310e8ee-test","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:47:17.465000000Z","email_hash":"4568b110--v16","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:46:55.398000000Z","email_hash":"ee09d06d-re50","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:46:45.099000000Z","email_hash":"fe83e987-ting","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:46:18.726000000Z","email_hash":"8cfc6d50-test","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:46:16.411000000Z","email_hash":"f35e81c1-vaca","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-03T23:46:02.956000000Z","email_hash":"dc3a25f0-re50","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-06-02T01:44:58.717000000Z","email_hash":"e0d06bb1-andy","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-06-01T17:21:11.858000000Z","email_hash":"7fe65270-asha","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-31T01:58:17.546000000Z","email_hash":"a7ea7145-ones","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-30T18:33:19.817000000Z","email_hash":"28e9c389-nina","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-29T20:20:12.509000000Z","email_hash":"620d4faa-gail","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Following Up"},{"created_at":"2026-05-29T15:46:17.888000000Z","email_hash":"eac9efbc-onms","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-29T00:51:35.318000000Z","email_hash":"93f677e1-heri","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-29T00:38:39.547000000Z","email_hash":"3946e727-1024","source":"gads_lp","is_mql":false,"is_sql":false,"current_stage":"New"},{"created_at":"2026-05-28T18:37:41.758000000Z","email_hash":"60eb95c1-edel","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T18:36:08.403000000Z","email_hash":"8f831099-leri","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-28T18:36:01.046000000Z","email_hash":"2675bd51-edel","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T18:35:56.961000000Z","email_hash":"54395f04-ieta","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T18:35:52.930000000Z","email_hash":"cec2bbd7-ta.o","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T18:35:38.974000000Z","email_hash":"b79ae2d2-edel","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T18:35:08.242000000Z","email_hash":"4ada48cc-edel","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Gone Cold"},{"created_at":"2026-05-28T12:05:00.580000000Z","email_hash":"4542d056-sd","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-28T04:12:29.363000000Z","email_hash":"5312eb4f-idan","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Discovery Call Done"},{"created_at":"2026-05-27T22:25:57.621000000Z","email_hash":"7b9f84b3-llin","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-27T18:38:21.582000000Z","email_hash":"27546ad7-zach","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-27T14:00:02.270000000Z","email_hash":"88a67303-nell","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Following Up"},{"created_at":"2026-05-26T21:44:50.533000000Z","email_hash":"b512a0ba-.jit","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-26T21:21:51.614000000Z","email_hash":"017af642-bea","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T20:12:36.000000000Z","email_hash":"14830a15-elle","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-22T18:27:31.514000000Z","email_hash":"56b8f638-team","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-22T15:26:41.313000000Z","email_hash":"d0872424-wski","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T10:58:56.177000000Z","email_hash":"f4ecea4b-acky","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-22T01:26:33.532000000Z","email_hash":"1553671c-abhi","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-21T15:45:18.418000000Z","email_hash":"d27480b9-eric","source":"other","is_mql":true,"is_sql":false,"current_stage":"Disqualified"},{"created_at":"2026-05-20T21:56:49.134000000Z","email_hash":"0139e298-dawn","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-20T20:46:27.802000000Z","email_hash":"b6180fff-nise","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-20T19:42:26.561000000Z","email_hash":"36cf6cac-ajia","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-20T06:48:02.287000000Z","email_hash":"c97be7dc-udev","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T16:22:22.660000000Z","email_hash":"d370f156-ermo","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Closed Won"},{"created_at":"2026-05-19T15:43:35.804000000Z","email_hash":"90539812-aron","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T00:39:28.543000000Z","email_hash":"1b019115-viad","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-19T00:39:20.425000000Z","email_hash":"367b0f87-hase","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-19T00:39:16.723000000Z","email_hash":"250b1933-ylor","source":"bison_cold","is_mql":true,"is_sql":true,"current_stage":"Proposal Sent"},{"created_at":"2026-05-19T00:39:12.215000000Z","email_hash":"f2134292-ward","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Call Scheduled"},{"created_at":"2026-05-18T19:08:45.951000000Z","email_hash":"2dcc3cd4-erra","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"},{"created_at":"2026-05-18T15:46:55.658000000Z","email_hash":"9e0c8712-5421","source":"bison_cold","is_mql":true,"is_sql":false,"current_stage":"Following Up"},{"created_at":"2026-05-17T16:55:43.501000000Z","email_hash":"f348bbf5-nnah","source":"bison_cold","is_mql":false,"is_sql":false,"current_stage":"In Conversation"}],"stale":false,"outreach":{"emails_sent":17622,"total_leads_contacted":8550,"replied":247,"interested":64,"bounced":121,"unsubscribed":0,"active_campaigns":2,"campaign_count":9,"reply_rate":0.028888888888888888,"positive_reply_rate":0.2591093117408907,"bounce_rate":0.00686641697877653,"campaigns":[{"name":"26.05.26, US","status":"completed","emails_sent":4157,"total_leads_contacted":2119,"replied":44,"interested":7,"reply_rate":0.020764511562057573},{"name":"20.05.26, US","status":"completed","emails_sent":3795,"total_leads_contacted":1944,"replied":42,"interested":12,"reply_rate":0.021604938271604937},{"name":"14.05.26, US","status":"completed","emails_sent":2905,"total_leads_contacted":1493,"replied":34,"interested":9,"reply_rate":0.02277294038847957},{"name":"04.05.26, US, C-level, health/wellness/care ind.","status":"active","emails_sent":1985,"total_leads_contacted":733,"replied":33,"interested":8,"reply_rate":0.045020463847203276},{"name":"28.04.26, US, C-level, health/wealth+","status":"active","emails_sent":1661,"total_leads_contacted":590,"replied":43,"interested":20,"reply_rate":0.07288135593220339},{"name":"11.05.26, US","status":"completed","emails_sent":1278,"total_leads_contacted":653,"replied":23,"interested":4,"reply_rate":0.03522205206738132},{"name":"01.06.26, US","status":"completed","emails_sent":940,"total_leads_contacted":477,"replied":12,"interested":1,"reply_rate":0.025157232704402517},{"name":"13.05.26, US","status":"completed","emails_sent":737,"total_leads_contacted":377,"replied":13,"interested":2,"reply_rate":0.034482758620689655},{"name":"27.04.26, US, C-level, personalized","status":"paused","emails_sent":164,"total_leads_contacted":164,"replied":3,"interested":1,"reply_rate":0.018292682926829267}]},"costs":{"months":[{"month":"2026-04","total":4000,"items":[{"label":"KAMG service fee","amount":4000}],"leads":21,"cpl":190.47619047619048},{"month":"2026-05","total":4000,"items":[{"label":"KAMG service fee","amount":4000}],"leads":71,"cpl":56.33802816901409}],"total_cost":8000,"total_leads":92,"closed_won":3,"blended_cpl":86.95652173913044,"blended_cpa":2666.6666666666665,"line_labels":["KAMG service fee"]},"google_ads":{"window":{"start":"2026-05-16","end":"2026-06-02"},"daily":[{"date":"2026-05-16","clicks":0,"impressions":0,"avg_cpc":0,"conversions":0,"est_cost":0},{"date":"2026-05-17","clicks":0,"impressions":0,"avg_cpc":0,"conversions":0,"est_cost":0},{"date":"2026-05-18","clicks":1,"impressions":71,"avg_cpc":2.81,"conversions":0,"est_cost":2.81},{"date":"2026-05-19","clicks":9,"impressions":402,"avg_cpc":4.14,"conversions":0,"est_cost":37.26},{"date":"2026-05-20","clicks":90,"impressions":1075,"avg_cpc":2.69,"conversions":0,"est_cost":242.1},{"date":"2026-05-21","clicks":125,"impressions":906,"avg_cpc":2.21,"conversions":0,"est_cost":276.25},{"date":"2026-05-22","clicks":66,"impressions":698,"avg_cpc":2.27,"conversions":1,"est_cost":149.82},{"date":"2026-05-23","clicks":72,"impressions":632,"avg_cpc":2.54,"conversions":0,"est_cost":182.88},{"date":"2026-05-24","clicks":55,"impressions":395,"avg_cpc":2.02,"conversions":0,"est_cost":111.1},{"date":"2026-05-25","clicks":49,"impressions":399,"avg_cpc":2.49,"conversions":0,"est_cost":122.01},{"date":"2026-05-26","clicks":42,"impressions":1030,"avg_cpc":3.95,"conversions":0,"est_cost":165.9},{"date":"2026-05-27","clicks":90,"impressions":1321,"avg_cpc":3.23,"conversions":0,"est_cost":290.7},{"date":"2026-05-28","clicks":38,"impressions":722,"avg_cpc":3.86,"conversions":0,"est_cost":146.68},{"date":"2026-05-29","clicks":97,"impressions":5492,"avg_cpc":1.72,"conversions":0,"est_cost":166.84},{"date":"2026-05-30","clicks":84,"impressions":3211,"avg_cpc":1.86,"conversions":1,"est_cost":156.24},{"date":"2026-05-31","clicks":89,"impressions":4061,"avg_cpc":1.68,"conversions":0,"est_cost":149.52},{"date":"2026-06-01","clicks":68,"impressions":2912,"avg_cpc":2.37,"conversions":0,"est_cost":161.16},{"date":"2026-06-02","clicks":61,"impressions":1831,"avg_cpc":2.78,"conversions":0,"est_cost":169.58}],"totals":{"impressions":25158,"clicks":1036,"ctr":0.041179744017807454,"avg_cpc":2.44,"conversions":2,"est_spend":2530.85,"est_cost_per_conv":1265.43},"spend_estimated":true},"scorecard":[{"source":"gads_lp","leads":11,"mql":0,"sql":0,"closed_won":0,"cost":2530.85,"cpl":230.08,"cost_estimated":true},{"source":"bison_cold","leads":92,"mql":31,"sql":13,"closed_won":3,"cost":null,"cpl":null,"cost_estimated":false}],"conversion_rates":{"lead_to_mql":0.301,"mql_to_sql":0.419,"sql_to_won":0.231}}</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="assets/charts.js"></script>
+<script src="assets/nav.js"></script>
 </body>
 </html>
