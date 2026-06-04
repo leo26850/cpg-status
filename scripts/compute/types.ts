@@ -45,6 +45,50 @@ export type LeadLogRow = {
 export type { OutreachData, OutreachCampaignRow } from './outreach.js';
 export type { CostsData, CostLineItem, PerMonthCost } from './costs.js';
 
+// --- Google Ads (Phase 1: account-level, from CSV; spend is ESTIMATED) ---
+export type GoogleAdsDaily = {
+  date: string;        // ISO YYYY-MM-DD
+  clicks: number;
+  impressions: number;
+  avg_cpc: number;     // USD, as exported (already an average)
+  conversions: number;
+  est_cost: number;    // derived: clicks * avg_cpc
+};
+
+export type GoogleAdsData = {
+  window: { start: string; end: string };
+  daily: GoogleAdsDaily[];
+  totals: {
+    impressions: number;
+    clicks: number;
+    ctr: number;                       // clicks / impressions (0..1)
+    avg_cpc: number;                   // est_spend / clicks
+    conversions: number;
+    est_spend: number;                 // sum of est_cost
+    est_cost_per_conv: number | null;  // est_spend / conversions (null if 0 conv)
+  };
+  spend_estimated: true;               // always true in Phase 1 (drives the UI label)
+};
+
+// --- Per-channel scorecard ---
+export type ScorecardRow = {
+  source: Channel;
+  leads: number;
+  mql: number;
+  sql: number;
+  closed_won: number;
+  cost: number | null;            // attributed cost, null if not cleanly attributable
+  cpl: number | null;             // cost / leads
+  cost_estimated: boolean;        // true when cost came from estimated Ads spend
+};
+
+// --- Funnel conversion rates (0..1, null when denominator is 0) ---
+export type ConversionRates = {
+  lead_to_mql: number | null;
+  mql_to_sql: number | null;
+  sql_to_won: number | null;
+};
+
 export type ReportData = {
   generated_at: string;
   window: { start: string; end: string };
@@ -67,4 +111,7 @@ export type ReportData = {
   stale_reason?: string;
   outreach?: import('./outreach.js').OutreachData | null;
   costs?: import('./costs.js').CostsData | null;
+  google_ads?: GoogleAdsData | null;
+  scorecard?: ScorecardRow[];
+  conversion_rates?: ConversionRates;
 };
