@@ -1,97 +1,192 @@
-// assets/charts.js — runs on page load, reads embedded report data, builds 5 charts.
-(function() {
+// assets/charts.js — lazy per-panel Chart.js initialization
+window.CPGCharts = (function () {
   const data = JSON.parse(document.getElementById('report-data').textContent);
+  const built = new Set();
 
+  // Dark-premium theme defaults
+  Chart.defaults.color = '#a1a1aa';
+  Chart.defaults.borderColor = '#26262b';
   Chart.defaults.font.family = "'Outfit', system-ui, sans-serif";
   Chart.defaults.font.size = 12;
-  Chart.defaults.color = '#71717a';
-  Chart.defaults.borderColor = '#27272a';
 
   const ACCENT = '#f5a623';
-  const BLUE = '#60a5fa';
-  const GREEN = '#22c55e';
+  const BLUE   = '#60a5fa';
+  const GREEN  = '#34d399';
+  const GRID   = '#26262b';
 
-  // 4.2 — Stacked bar by source (section 4)
-  const bySourceCtx = document.getElementById('chart-by-source');
-  if (bySourceCtx) {
-    new Chart(bySourceCtx, {
+  function ensure(panelId) {
+    if (built.has(panelId)) return;
+    built.add(panelId);
+    if (panelId === 'overview')   { buildFunnel(); buildBySource(); }
+    if (panelId === 'googleads')  { buildGadsTrend(); }
+  }
+
+  // ===== OVERVIEW: Funnel horizontal bar =====
+  function buildFunnel() {
+    const ctx = document.getElementById('chart-funnel');
+    if (!ctx) return;
+    const f = data.funnel;
+    new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: data.monthly.map(m => m.month),
-        datasets: [
-          { label: 'gads_lp', data: data.monthly.map(m => m.leads_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.leads_by_source.bison_cold), backgroundColor: BLUE, borderRadius: 0 },
-        ],
+        labels: ['Leads', 'MQL', 'SQL', 'Closed Won'],
+        datasets: [{
+          label: 'Count',
+          data: [f.leads, f.mql, f.sql, f.closed_won],
+          backgroundColor: [ACCENT, BLUE, GREEN, '#a78bfa'],
+          borderWidth: 0,
+          borderRadius: 6,
+        }],
       },
       options: {
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          x: { stacked: true, grid: { display: false } },
-          y: { stacked: true, beginAtZero: true, max: 100, ticks: { stepSize: 10, precision: 0 }, grid: { color: '#27272a' } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.parsed.x.toLocaleString()} contacts`,
+            },
+          },
         },
-        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: GRID },
+            ticks: { precision: 0 },
+          },
+          y: {
+            grid: { display: false },
+          },
+        },
       },
     });
   }
 
-  // 4.4 — Grouped bar: MQL by source by month (section 5)
-  const mqlBySourceCtx = document.getElementById('chart-mql-by-source');
-  if (mqlBySourceCtx) {
-    new Chart(mqlBySourceCtx, {
-      type: 'bar',
-      data: {
-        labels: data.monthly.map(m => m.month),
-        datasets: [
-          { label: 'gads_lp', data: data.monthly.map(m => m.mql_by_source.gads_lp), backgroundColor: ACCENT, borderRadius: 0 },
-          { label: 'bison_cold', data: data.monthly.map(m => m.mql_by_source.bison_cold), backgroundColor: BLUE, borderRadius: 0 },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#27272a' } } },
-        plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'MQL by source' } },
-      },
-    });
-  }
-
-  // 4.5 — Donut: SQL stage split (current month overall) (section 6)
-  const donutCtx = document.getElementById('chart-sql-donut');
-  if (donutCtx) {
-    const s = data.sql_stage_split;
-    new Chart(donutCtx, {
+  // ===== OVERVIEW: Channel split donut =====
+  function buildBySource() {
+    const ctx = document.getElementById('chart-by-source');
+    if (!ctx) return;
+    const sources = data.by_source || [];
+    const labels = sources.map((s) => s.source === 'gads_lp' ? 'Google Ads' : s.source === 'bison_cold' ? 'Cold Email' : 'Other');
+    const counts = sources.map((s) => s.leads);
+    new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Proposal Sent', 'Negotiating', 'Closed Won'],
-        datasets: [{ data: [s.proposal_sent, s.negotiating, s.closed_won], backgroundColor: [ACCENT, BLUE, GREEN], borderWidth: 0 }],
+        labels,
+        datasets: [{
+          data: counts,
+          backgroundColor: [ACCENT, BLUE, GREEN, '#a78bfa'],
+          borderWidth: 0,
+          borderRadius: 4,
+          spacing: 3,
+        }],
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'circle',
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${ctx.parsed} leads`,
+            },
+          },
+        },
+      },
     });
   }
 
-  // 4.6 — Cohort line: spend N-3 vs wins value (section 8)
-  const cohortCtx = document.getElementById('chart-cohort-line');
-  if (cohortCtx) {
-    new Chart(cohortCtx, {
+  // ===== GOOGLE ADS: Daily trend line =====
+  function buildGadsTrend() {
+    const ctx = document.getElementById('chart-gads-trend');
+    if (!ctx) return;
+    if (!data.google_ads) return;
+    const daily = data.google_ads.daily;
+    const labels = daily.map((d) => d.date.slice(5)); // MM-DD for compactness
+    new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.cohort_cpa.map(c => c.cohort_month),
+        labels,
         datasets: [
-          { label: 'Spend (N−3)', data: data.cohort_cpa.map(c => c.spend_n_minus_3), borderColor: ACCENT, backgroundColor: ACCENT, tension: 0.2 },
-          { label: 'Wins (count)', data: data.cohort_cpa.map(c => c.wins), borderColor: GREEN, backgroundColor: GREEN, tension: 0.2, yAxisID: 'y1' },
+          {
+            label: 'Impressions',
+            data: daily.map((d) => d.impressions),
+            borderColor: BLUE,
+            backgroundColor: 'rgba(96,165,250,.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+            pointBackgroundColor: BLUE,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Clicks',
+            data: daily.map((d) => d.clicks),
+            borderColor: ACCENT,
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            pointRadius: 3,
+            pointBackgroundColor: ACCENT,
+            yAxisID: 'y1',
+          },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        scales: {
-          y: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Spend $' }, grid: { color: '#27272a' } },
-          y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Wins' } },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'circle',
+            },
+          },
         },
-        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: {
+            grid: { color: GRID },
+            ticks: {
+              maxTicksLimit: 10,
+              maxRotation: 0,
+            },
+          },
+          y: {
+            position: 'left',
+            beginAtZero: true,
+            grid: { color: GRID },
+            title: {
+              display: true,
+              text: 'Impressions',
+              color: '#a1a1aa',
+            },
+          },
+          y1: {
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            title: {
+              display: true,
+              text: 'Clicks',
+              color: '#a1a1aa',
+            },
+          },
+        },
       },
     });
   }
+
+  return { ensure };
 })();
