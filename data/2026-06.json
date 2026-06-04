@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04T16:30:04.782Z",
+  "generated_at": "2026-06-04T16:49:20.566Z",
   "window": {
     "start": "2026-05-11",
     "end": "2026-06-04"
@@ -566,13 +566,13 @@
     "total_leads_contacted": 8550,
     "replied": 247,
     "interested": 64,
-    "bounced": 121,
+    "bounced": 122,
     "unsubscribed": 0,
     "active_campaigns": 2,
     "campaign_count": 9,
     "reply_rate": 0.028888888888888888,
     "positive_reply_rate": 0.2591093117408907,
-    "bounce_rate": 0.00686641697877653,
+    "bounce_rate": 0.006923164226535013,
     "campaigns": [
       {
         "name": "26.05.26, US",

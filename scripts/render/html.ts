@@ -218,7 +218,7 @@ function googleAdsPanel(r: ReportData): string {
     ${kpi('$' + fmtDec(t.avg_cpc), 'Avg. CPC',
       'Average cost per click — estimated from clicks × avg CPC in export.')}
     ${kpi(fmtInt(t.conversions), 'Conversions',
-      'Form submissions tracked by Google — reconciles with gads_lp leads in Attio.')}
+      'Conversions counted by Google’s own tag (see note above on how this differs from leads).')}
     ${kpi(
       fmtUsd(t.est_spend) + ' <span class="tag-estimated">estimated</span>',
       'Est. Spend',
@@ -237,8 +237,11 @@ function googleAdsPanel(r: ReportData): string {
     'Daily impressions (left axis) and clicks (right axis) over the reporting window.'
   );
 
+  const gadsLeads = r.scorecard?.find((s) => s.source === 'gads_lp')?.leads ?? 0;
+  const reconcile = `<strong>Conversions vs leads:</strong> Google’s conversion tag fired <strong>${fmtInt(t.conversions)}</strong> ${t.conversions === 1 ? 'time' : 'times'} this period, while Attio attributes <strong>${fmtInt(gadsLeads)}</strong> landing-page form-fills to Google Ads. These count different things — Google’s tag only fires on specific tracked actions, whereas every completed LP form becomes a lead. We report the form-fills (${fmtInt(gadsLeads)}) as the channel’s lead count.`;
+
   const disclaimerCallout = `<div class="callout info section-gap">
-    Google Ads is a new, ramping channel — live since mid-May 2026. Spend is estimated from clicks × average CPC (the export has no exact cost column). Exact spend and per-campaign breakdown arrive once the Google Ads developer token is approved (Phase 2).
+    Google Ads is a new, ramping channel — live since mid-May 2026. ${reconcile} Spend is estimated from clicks × average CPC (the export has no exact cost column); exact spend and per-campaign breakdown arrive once the Google Ads developer token is approved (Phase 2).
   </div>`;
 
   return `<section class="panel" id="panel-googleads" data-panel="googleads">
