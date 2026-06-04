@@ -3,374 +3,466 @@ import type { ReportData } from '../compute/types.js';
 import type { OutreachData } from '../compute/outreach.js';
 import type { CostsData } from '../compute/costs.js';
 
-export function renderHtml(r: ReportData): string {
-  const fmt = (n: number | null, opts?: { currency?: boolean; pct?: boolean }): string => {
-    if (n === null || n === undefined) return '—';
-    if (opts?.pct) return n > 1 ? '—' : (n * 100).toFixed(1) + '%';
-    if (opts?.currency) return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    return n.toLocaleString();
-  };
+// ===== FORMAT HELPERS =====
+const fmtInt = (n: number | null | undefined): string =>
+  n == null ? '—' : Math.round(n).toLocaleString('en-US');
 
+const fmtUsd = (n: number | null | undefined): string =>
+  n == null ? '—' : '$' + Math.round(n).toLocaleString('en-US');
+
+const fmtPct = (n: number | null | undefined): string =>
+  n == null ? '—' : (n * 100).toFixed(1) + '%';
+
+const fmtDec = (n: number | null | undefined, decimals = 2): string =>
+  n == null ? '—' : n.toFixed(decimals);
+
+// ===== KPI TILE & CARD HELPERS =====
+const kpi = (value: string, label: string, caption: string, extra = ''): string =>
+  `<div class="kpi">${extra}
+    <div class="kpi-value">${value}</div>
+    <div class="kpi-label">${label}</div>
+    <p class="caption">${caption}</p>
+  </div>`;
+
+const card = (title: string, body: string, caption = ''): string =>
+  `<div class="card">
+    <h3>${title}</h3>
+    ${body}
+    ${caption ? `<p class="card-caption">${caption}</p>` : ''}
+  </div>`;
+
+// ===== CHANNEL NAME MAP =====
+const channelName = (s: string): string => {
+  if (s === 'gads_lp')    return 'Google Ads';
+  if (s === 'bison_cold') return 'Cold Email';
+  return 'Other';
+};
+
+const channelSub = (s: string): string => {
+  if (s === 'gads_lp')    return 'Paid search via Google Ads LP';
+  if (s === 'bison_cold') return 'Bison cold outreach engine';
+  return 'Unattributed / direct';
+};
+
+// ===== PANEL: OVERVIEW =====
+function overviewPanel(r: ReportData): string {
+  const k = r.kpis;
+  const c = r.costs as CostsData | undefined;
+
+  // Cost per meeting = blended total cost ÷ mql
+  const costPerMeeting = (c && c.total_cost > 0 && k.mql > 0)
+    ? c.total_cost / k.mql
+    : null;
+
+  const kpis = `<div class="kpi-grid">
+    ${kpi(fmtInt(k.total_leads), 'Leads Generated',
+      'Total inbound leads our campaigns generated this period.')}
+    ${kpi(fmtInt(k.mql), 'Meetings Booked',
+      'Prospects who booked a discovery call — our Marketing Qualified Lead.')}
+    ${kpi(fmtInt(k.closed_won), 'Deals Closed',
+      'Closed-won deals sourced from these campaigns.')}
+    ${kpi(fmtUsd(costPerMeeting), 'Cost per Meeting',
+      'Total marketing cost ÷ meetings booked. Blended across all channels.')}
+  </div>`;
+
+  const funnelCard = card(
+    'Lead Funnel',
+    `<canvas id="chart-funnel" height="180"></canvas>`,
+    'How leads move from first touch to closed deal — each bar is a funnel stage.'
+  );
+
+  const sourceCard = card(
+    'Channel Split',
+    `<canvas id="chart-by-source" height="220"></canvas>`,
+    'Share of leads by channel: Google Ads vs cold email outreach.'
+  );
+
+  return `<section class="panel is-active" id="panel-overview" data-panel="overview">
+  <div class="panel-header">
+    <div class="panel-eyebrow">01 · Overview</div>
+    <h1>Results at a Glance</h1>
+    <p class="panel-desc">What KAMG delivered this period — leads generated, meetings booked, and deals closed across both channels.</p>
+    <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
+  </div>
+  ${kpis}
+  <div class="grid-2 section-gap">
+    ${funnelCard}
+    ${sourceCard}
+  </div>
+</section>`;
+}
+
+// ===== PANEL: CHANNELS =====
+function channelsPanel(r: ReportData): string {
+  const rows = (r.scorecard ?? []).map((row) => {
+    const cplDisplay = row.cost_estimated
+      ? `${fmtUsd(row.cpl)} <span class="tag-estimated">est.</span>`
+      : (row.cpl != null ? fmtUsd(row.cpl) : '<span class="tag-muted">—</span>');
+
+    const costDisplay = row.cost_estimated
+      ? `${fmtUsd(row.cost)} <span class="tag-estimated">est.</span>`
+      : (row.cost != null ? fmtUsd(row.cost) : '<span style="color:var(--faint)">—</span>');
+
+    return `<div class="channel-card">
+      <div class="channel-card-name">${channelName(row.source)}</div>
+      <div class="channel-card-sub">${channelSub(row.source)}</div>
+      <ul class="channel-stat-list">
+        <li><span class="channel-stat-label">Leads</span><span class="channel-stat-value">${fmtInt(row.leads)}</span></li>
+        <li><span class="channel-stat-label">Meetings (MQL)</span><span class="channel-stat-value">${fmtInt(row.mql)}</span></li>
+        <li><span class="channel-stat-label">Proposals (SQL)</span><span class="channel-stat-value">${fmtInt(row.sql)}</span></li>
+        <li><span class="channel-stat-label">Deals Closed</span><span class="channel-stat-value">${fmtInt(row.closed_won)}</span></li>
+        <li><span class="channel-stat-label">Attributed Cost</span><span class="channel-stat-value">${costDisplay}</span></li>
+        <li><span class="channel-stat-label">Cost per Lead</span><span class="channel-stat-value">${cplDisplay}</span></li>
+      </ul>
+      ${row.cost == null ? '<p class="caption" style="margin-top:12px">Cost not attributed — blended cost shown in Funnel &amp; Conversion.</p>' : ''}
+    </div>`;
+  }).join('');
+
+  return `<section class="panel" id="panel-channels" data-panel="channels">
+  <div class="panel-header">
+    <div class="panel-eyebrow">02 · Channels</div>
+    <h1>Channel Scorecard</h1>
+    <p class="panel-desc">How each acquisition channel is performing side by side — Google Ads (paid search) vs cold email outreach.</p>
+    <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
+  </div>
+  <div class="channel-grid section-gap">
+    ${rows || '<div class="empty-state">No channel data available.</div>'}
+  </div>
+</section>`;
+}
+
+// ===== PANEL: COLD EMAIL =====
+function coldEmailPanel(r: ReportData): string {
+  if (!r.outreach) {
+    return `<section class="panel" id="panel-coldemail" data-panel="coldemail">
+  <div class="panel-header">
+    <div class="panel-eyebrow">03 · Cold Email</div>
+    <h1>Cold Email Performance</h1>
+  </div>
+  <div class="empty-state">Outreach data not available.</div>
+</section>`;
+  }
+
+  const o = r.outreach as OutreachData;
+
+  const kpis = `<div class="kpi-grid">
+    ${kpi(fmtInt(o.emails_sent), 'Emails Sent',
+      'Total cold emails delivered across all active campaigns.')}
+    ${kpi(fmtPct(o.reply_rate), 'Reply Rate',
+      'Share of sends that received any reply from the prospect.')}
+    ${kpi(fmtInt(o.interested), 'Interested Replies',
+      'Replies our team flagged as interested — warm leads.')}
+    ${kpi(fmtInt(o.total_leads_contacted), 'Contacts Reached',
+      'Unique prospects contacted across all campaigns.')}
+  </div>`;
+
+  const campaignRows = o.campaigns.map((c) =>
+    `<tr>
+      <td>${c.name}</td>
+      <td><span class="tag ${c.status === 'active' ? 'tag-green' : 'tag-outline'}">${c.status}</span></td>
+      <td>${fmtInt(c.emails_sent)}</td>
+      <td>${fmtInt(c.replied)}</td>
+      <td>${fmtInt(c.interested)}</td>
+      <td>${fmtPct(c.reply_rate)}</td>
+    </tr>`
+  ).join('');
+
+  const campaignsCard = card(
+    'Campaigns by Interest',
+    `<div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>Campaign</th><th>Status</th><th>Sent</th><th>Replied</th><th>Interested</th><th>Reply Rate</th></tr>
+        </thead>
+        <tbody>${campaignRows}</tbody>
+      </table>
+    </div>`,
+    'Open rate is not tracked — campaigns use plain-text sends with open tracking disabled.'
+  );
+
+  return `<section class="panel" id="panel-coldemail" data-panel="coldemail">
+  <div class="panel-header">
+    <div class="panel-eyebrow">03 · Cold Email</div>
+    <h1>Cold Email Performance</h1>
+    <p class="panel-desc">Bison-powered outreach — the volume engine driving the majority of CPG leads today.</p>
+    <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
+  </div>
+  ${kpis}
+  ${campaignsCard}
+</section>`;
+}
+
+// ===== PANEL: GOOGLE ADS =====
+function googleAdsPanel(r: ReportData): string {
+  const g = r.google_ads;
+
+  if (!g) {
+    return `<section class="panel" id="panel-googleads" data-panel="googleads">
+  <div class="panel-header">
+    <div class="panel-eyebrow">04 · Google Ads</div>
+    <h1>Google Ads Performance</h1>
+  </div>
+  <div class="empty-state">Google Ads data not loaded.</div>
+</section>`;
+  }
+
+  const t = g.totals;
+
+  const kpis = `<div class="kpi-grid">
+    ${kpi(fmtInt(t.impressions), 'Impressions',
+      'Total times our ads were shown to searchers in this window.')}
+    ${kpi(fmtInt(t.clicks), 'Clicks',
+      'Number of clicks through to the landing page.')}
+    ${kpi(fmtPct(t.ctr), 'Click-Through Rate',
+      'Clicks ÷ impressions. Measures how compelling our ad copy is.')}
+    ${kpi('$' + fmtDec(t.avg_cpc), 'Avg. CPC',
+      'Average cost per click — estimated from clicks × avg CPC in export.')}
+    ${kpi(fmtInt(t.conversions), 'Conversions',
+      'Form submissions tracked by Google — reconciles with gads_lp leads in Attio.')}
+    ${kpi(
+      fmtUsd(t.est_spend) + ' <span class="tag-estimated">estimated</span>',
+      'Est. Spend',
+      'Derived as Σ daily clicks × avg CPC. The export has no exact cost column.'
+    )}
+    ${kpi(
+      (t.est_cost_per_conv != null ? fmtUsd(t.est_cost_per_conv) : '—') + ' <span class="tag-estimated">estimated</span>',
+      'Est. Cost / Conversion',
+      'Estimated spend ÷ conversions. Will sharpen as volume grows.'
+    )}
+  </div>`;
+
+  const trendCard = card(
+    'Daily Impressions & Clicks',
+    `<canvas id="chart-gads-trend" height="220"></canvas>`,
+    'Daily impressions (left axis) and clicks (right axis) over the reporting window.'
+  );
+
+  const disclaimerCallout = `<div class="callout info section-gap">
+    Google Ads is a new, ramping channel — live since mid-May 2026. Spend is estimated from clicks × average CPC (the export has no exact cost column). Exact spend and per-campaign breakdown arrive once the Google Ads developer token is approved (Phase 2).
+  </div>`;
+
+  return `<section class="panel" id="panel-googleads" data-panel="googleads">
+  <div class="panel-header">
+    <div class="panel-eyebrow">04 · Google Ads</div>
+    <h1>Google Ads Performance</h1>
+    <p class="panel-desc">Account-level paid search performance for the period ${g.window.start} → ${g.window.end}. This is Phase 1 (CSV-based); live API data arrives in Phase 2.</p>
+    <p class="panel-freshness">Ads data window: ${g.window.start} → ${g.window.end}</p>
+  </div>
+  ${disclaimerCallout}
+  ${kpis}
+  ${trendCard}
+</section>`;
+}
+
+// ===== PANEL: FUNNEL & CONVERSION =====
+function funnelPanel(r: ReportData): string {
+  const f = r.funnel;
+  const cr = r.conversion_rates;
+  const c = r.costs as CostsData | undefined;
+
+  const stages: Array<{ name: string; count: number; sub: string; color: string }> = [
+    { name: 'Leads',      count: f.leads,      sub: 'All inbound leads from campaigns',   color: 'var(--accent)' },
+    { name: 'MQL',        count: f.mql,         sub: 'Booked a discovery call',             color: 'var(--blue)' },
+    { name: 'SQL',        count: f.sql,         sub: 'Reached Proposal Sent or later',      color: 'var(--green)' },
+    { name: 'Closed Won', count: f.closed_won,  sub: 'Deal closed',                         color: '#a78bfa' },
+  ];
+
+  const rates: Array<{ label: string; value: number | null }> = cr ? [
+    { label: 'Lead → MQL',         value: cr.lead_to_mql },
+    { label: 'MQL → SQL',          value: cr.mql_to_sql  },
+    { label: 'SQL → Closed Won',   value: cr.sql_to_won  },
+  ] : [];
+
+  const stageRows = stages.map((s, i) => {
+    const rateChip = (i < rates.length)
+      ? `<div class="funnel-arrow">↓ <span class="funnel-rate-chip">${fmtPct(rates[i].value)} ${rates[i].label}</span></div>`
+      : '';
+    return `<div class="funnel-stage-row">
+      <div class="funnel-stage-num" style="color:${s.color}">${fmtInt(s.count)}</div>
+      <div class="funnel-stage-info">
+        <div class="funnel-stage-name">${s.name}</div>
+        <div class="funnel-stage-sub">${s.sub}</div>
+      </div>
+    </div>${rateChip}`;
+  }).join('');
+
+  const stagesCard = card(
+    'Funnel Stages',
+    `<div class="funnel-stages">${stageRows}</div>`,
+    'Stage-by-stage counts with the conversion rate between each adjacent stage.'
+  );
+
+  // Blended efficiency from costs object
+  const blendedCpl = c?.blended_cpl ?? null;
+  const blendedCpa = c?.blended_cpa ?? null;
+
+  const efficiencyCard = card(
+    'Blended Efficiency',
+    `<div class="kpi-grid" style="gap:12px;margin-bottom:0">
+      <div class="kpi">
+        <div class="kpi-value">${fmtUsd(blendedCpl)}</div>
+        <div class="kpi-label">Blended CPL</div>
+        <p class="caption">Total marketing cost ÷ total leads. Across all channels.</p>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">${fmtUsd(blendedCpa)}</div>
+        <div class="kpi-label">Blended CPA</div>
+        <p class="caption">Total marketing cost ÷ closed-won deals.</p>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">${fmtUsd(c?.total_cost)}</div>
+        <div class="kpi-label">Total Spend</div>
+        <p class="caption">KAMG service fee included. Google Ads ad spend tracked separately.</p>
+      </div>
+    </div>`,
+    'Blended across all channels — total marketing cost ÷ leads (CPL) and ÷ closed deals (CPA). Google Ads spend is estimated.'
+  );
+
+  return `<section class="panel" id="panel-funnel" data-panel="funnel">
+  <div class="panel-header">
+    <div class="panel-eyebrow">05 · Funnel &amp; Conversion</div>
+    <h1>Funnel Breakdown</h1>
+    <p class="panel-desc">Full funnel with stage-by-stage conversion rates and blended cost efficiency metrics.</p>
+    <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
+  </div>
+  <div class="grid-2 section-gap">
+    ${stagesCard}
+    ${efficiencyCard}
+  </div>
+</section>`;
+}
+
+// ===== PANEL: METHODOLOGY =====
+function methodologyPanel(r: ReportData): string {
+  const genDate = r.generated_at.slice(0, 10);
+
+  return `<section class="panel" id="panel-methodology" data-panel="methodology">
+  <div class="panel-header">
+    <div class="panel-eyebrow">06 · Methodology</div>
+    <h1>How We Measure</h1>
+    <p class="panel-desc">Definitions, channel rules, data sources, and refresh cadence — so every number in this report is auditable.</p>
+    <p class="panel-freshness">Generated: ${r.generated_at}</p>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Definitions</h3>
+    <div class="method-grid">
+      <div class="method-item">
+        <h4>Lead</h4>
+        <p>Any contact who submitted the CPG landing-page form or was created in the Attio Leads object via the Bison reply webhook. Raw count, no qualification filter.</p>
+      </div>
+      <div class="method-item">
+        <h4>MQL — Marketing Qualified Lead</h4>
+        <p>Lead has reached Attio Leads stage <code>Booked Call</code>. Represents a booked discovery call with the CPG sales team.</p>
+      </div>
+      <div class="method-item">
+        <h4>SQL — Sales Qualified Lead</h4>
+        <p>Deal object has reached <code>Proposal Sent</code>, <code>Negotiating</code>, or <code>Closed Won</code> stage in Attio Deals.</p>
+      </div>
+      <div class="method-item">
+        <h4>Closed Won</h4>
+        <p>Deal at <code>Closed Won</code> stage. Counts only deals whose linked person matches a known lead source.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Channel Attribution Rules</h3>
+    <ul class="source-list">
+      <li><strong>gads_lp</strong> — lead_source = <code>gads_lp</code> in Attio. Set by the LP webhook when UTM source contains "google" or medium is "cpc".</li>
+      <li><strong>bison_cold</strong> — lead_source = <code>bison_cold</code>. Set when a Bison reply triggers lead creation via webhook.</li>
+      <li><strong>other</strong> — all remaining leads not matching the two above rules. Excluded from channel scorecard CPL.</li>
+    </ul>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Data Sources</h3>
+    <ul class="source-list">
+      <li><strong>Leads &amp; Deals</strong> — Attio live API (workspace: cpg-affiliate-partners). Pulled at build time via authenticated REST calls.</li>
+      <li><strong>Cold Email Metrics</strong> — Bison <code>/campaigns</code> endpoint. Sends, replied, interested per campaign. Open-rate not tracked (plain-text sends).</li>
+      <li><strong>Google Ads (Phase 1)</strong> — Account-level daily CSV export (<code>data/google_ads_export.csv</code>). Columns: Date, Clicks, Impressions, Avg. CPC, Conversions. Spend is derived (Σ clicks × avg CPC) and labeled <span class="tag-estimated">estimated</span>. No campaign-level breakdown in Phase 1.</li>
+      <li><strong>Cost Model</strong> — <code>data/marketing_costs.json</code> line items. Currently includes KAMG service fee. Google Ads exact spend will be added in Phase 2.</li>
+    </ul>
+  </div>
+
+  <div class="card section-gap">
+    <h3>Refresh Cadence</h3>
+    <p style="margin-bottom:8px">This report rebuilds automatically on a <strong>weekly schedule</strong> via a GitHub Actions workflow. The compute layer fetches live data from Attio and Bison at build time — no manual HTML editing required.</p>
+    <p>Report as of: <code>${genDate}</code></p>
+  </div>
+
+  <div class="callout info section-gap">
+    <strong>Honest omissions:</strong> Pipeline revenue and deal value are not shown — the Attio Deals value field is unpopulated (0/200 deals have a value). Revenue metrics will be added once CPG's sales team records deal values at close. Google Ads exact spend and per-campaign detail arrive in Phase 2 when the Google Ads developer token is approved.
+  </div>
+</section>`;
+}
+
+// ===== MAIN RENDER =====
+export function renderHtml(r: ReportData): string {
   const staleBanner = r.stale
-    ? `<div class="banner banner-stale"><div class="container"><strong>Stale</strong> — last refresh failed ${r.stale_reason ?? ''}</div></div>`
+    ? `<div class="banner-stale"><strong>Stale</strong> — last refresh failed ${(r as { stale_reason?: string }).stale_reason ?? ''}</div>`
     : '';
 
+  // Determine report month label from window
+  const windowEnd = r.window?.end ?? r.generated_at.slice(0, 7);
+  const reportMonth = windowEnd.slice(0, 7); // YYYY-MM
+
+  const navItems = [
+    { id: 'overview',     label: 'Overview',          num: '01' },
+    { id: 'channels',     label: 'Channels',           num: '02' },
+    { id: 'coldemail',    label: 'Cold Email',         num: '03' },
+    { id: 'googleads',    label: 'Google Ads',         num: '04' },
+    { id: 'funnel',       label: 'Funnel & Conversion', num: '05' },
+    { id: 'methodology',  label: 'Methodology',        num: '06' },
+  ];
+
+  const navButtons = navItems.map(({ id, label, num }) =>
+    `<button data-panel="${id}"><span class="nav-num">${num}</span>${label}</button>`
+  ).join('\n      ');
+
+  const genDate = r.generated_at.slice(0, 10);
+
+  const sidebar = `<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">CPG <span>×</span> KAMG</div>
+    <div class="report-month">${reportMonth}</div>
+  </div>
+  <nav>
+    ${navButtons}
+  </nav>
+  <div class="sidebar-footer">
+    Generated ${genDate}
+  </div>
+</aside>`;
+
+  const stage = `<main class="stage">
+  ${overviewPanel(r)}
+  ${channelsPanel(r)}
+  ${coldEmailPanel(r)}
+  ${googleAdsPanel(r)}
+  ${funnelPanel(r)}
+  ${methodologyPanel(r)}
+</main>`;
+
   return `<!DOCTYPE html>
-<html lang="en" data-aesthetic="editorial">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPG Affiliate — Lead Funnel</title>
+  <title>CPG Affiliate — ROI Report</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 ${staleBanner}
-<section class="band-dark">
-  <div class="container">
-    <span class="eyebrow">CPG Affiliate</span>
-    <h1>Lead Funnel Report</h1>
-    <p class="lede">Window: ${r.window.start} → ${r.window.end} · Generated ${r.generated_at.slice(0, 10)}</p>
-  </div>
-</section>
-
-${renderKpiBar(r, fmt)}
-${renderFunnel(r)}
-${renderBySource(r, fmt)}
-${renderOutreach(r, fmt)}
-${renderMql(r, fmt)}
-${renderSql(r, fmt)}
-${renderCosts(r, fmt)}
-${renderDefinitions()}
-
-<footer><div class="container">Generated by <code>cpg-status</code> · ${r.generated_at}</div></footer>
-
+${sidebar}
+${stage}
 <script id="report-data" type="application/json">${JSON.stringify(r)}</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="assets/charts.js"></script>
+<script src="assets/nav.js"></script>
 </body>
 </html>`;
 }
 
-function renderFunnel(r: ReportData): string {
-  const f = r.funnel;
-  if (!f || f.leads === 0) {
-    return `<section><div class="container">
-    <span class="section-num">03 · Funnel</span>
-    <h2>Lead → Closed drop-off</h2>
-    <p class="funnel-nodata">No lead data for this window.</p>
-  </div></section>`;
-  }
-
-  const stages = [
-    { name: 'Leads',      count: f.leads,      color: 'var(--accent)',     textColor: '#09090b' },
-    { name: 'MQL',        count: f.mql,         color: '#b27a18',           textColor: '#09090b' },
-    { name: 'SQL',        count: f.sql,         color: 'var(--blue)',       textColor: '#09090b' },
-    { name: 'Closed Won', count: f.closed_won,  color: 'var(--green)',      textColor: '#09090b' },
-  ] as const;
-
-  const MIN_WIDTH = 6;
-  const NARROW_THRESHOLD = 12; // bars under this width carry the count outside, to the right
-
-  const bars = stages.map((s, i) => {
-    const pctOfLeads = ((s.count / f.leads) * 100).toFixed(1);
-    const barWidth = Math.max(MIN_WIDTH, Math.round((s.count / f.leads) * 100));
-    const isNarrow = barWidth < NARROW_THRESHOLD;
-    let convLine = '';
-    if (i > 0) {
-      const prev = stages[i - 1];
-      const conv = prev.count > 0 ? ((s.count / prev.count) * 100).toFixed(1) : '—';
-      convLine = ` <span class="funnel-conv">· ${conv}% from ${prev.name}</span>`;
-    }
-    const inBarCount = isNarrow ? '' : `<span class="funnel-count" style="color:${s.textColor};">${s.count}</span>`;
-    const outBarCount = isNarrow ? `<span class="funnel-count-out">${s.count}</span>` : '';
-    return `<div class="funnel-row">
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:${barWidth}%;background:${s.color};">${inBarCount}</div>${outBarCount}
-      </div>
-      <div class="funnel-meta">
-        <span class="funnel-stage">${s.name}</span>
-        <span class="funnel-pct">${pctOfLeads}% of leads</span>${convLine}
-      </div>
-    </div>`;
-  }).join('');
-
-  return `<section><div class="container">
-    <span class="section-num">03 · Funnel</span>
-    <h2>Lead → Closed drop-off</h2>
-    <div class="funnel">${bars}</div>
-  </div></section>`;
-}
-
-function renderConversionRates(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const f = r.funnel;
-  const leadToMql = f.leads > 0 ? f.mql / f.leads : null;
-  const mqlToSql = f.mql > 0 ? f.sql / f.mql : null;
-  const sqlToWon = f.sql > 0 ? f.closed_won / f.sql : null;
-  return `<div class="conv-grid">
-    <div class="conv-item">
-      <div class="conv-pct">${fmt(leadToMql, { pct: true })}</div>
-      <div class="conv-label">Lead → MQL</div>
-    </div>
-    <div class="conv-item">
-      <div class="conv-pct">${fmt(mqlToSql, { pct: true })}</div>
-      <div class="conv-label">MQL → SQL</div>
-    </div>
-    <div class="conv-item">
-      <div class="conv-pct">${fmt(sqlToWon, { pct: true })}</div>
-      <div class="conv-label">SQL → Closed Won</div>
-    </div>
-  </div>`;
-}
-
-function renderKpiBar(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const k = r.kpis;
-  return `<section><div class="container">
-    <span class="section-num">02 · Headline</span>
-    <h2>Current month at a glance</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">${fmt(k.total_leads)}</div><div class="stat-label">Total Leads</div></div>
-      <div class="stat"><div class="stat-num">${fmt(k.mql)}</div><div class="stat-label">MQL</div></div>
-      <div class="stat"><div class="stat-num">${fmt(k.sql)}</div><div class="stat-label">SQL</div></div>
-      <div class="stat"><div class="stat-num">${fmt(k.closed_won)}</div><div class="stat-label">Closed Won</div></div>
-      <div class="stat"><div class="stat-num">${fmt(r.costs?.blended_cpl ?? null, { currency: true })}</div><div class="stat-label">CPL</div></div>
-      <div class="stat"><div class="stat-num">${fmt(r.costs?.blended_cpa ?? null, { currency: true })}</div><div class="stat-label">CPA</div></div>
-    </div>
-    ${renderConversionRates(r, fmt)}
-  </div></section>`;
-}
-
-function renderMonthlyTable(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const rows = r.monthly.map((m) => `
-    <tr>
-      <td>${m.month}</td>
-      <td>${fmt(m.spend_by_source.gads_lp, { currency: true })}</td>
-      <td>${fmt(m.spend_by_source.bison_cold, { currency: true })}</td>
-      <td>${fmt(m.spend_total, { currency: true })}</td>
-      <td>${fmt(m.total_leads)}</td>
-      <td>${fmt(m.cpl, { currency: true })}</td>
-    </tr>`).join('');
-  return `<section><div class="container">
-    <span class="section-num">03 · Spend & CPL</span>
-    <h2>Spend, leads, cost per lead</h2>
-    <table>
-      <thead><tr><th>Month</th><th>Spend (gads)</th><th>Spend (bison)</th><th>Total Spend</th><th>Leads</th><th>CPL</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div></section>`;
-}
-
-function renderMomTrend(r: ReportData): string {
-  if (r.monthly.length < 2) return '';
-  const latest = r.monthly[r.monthly.length - 1];
-  const prior = r.monthly[r.monthly.length - 2];
-  if (prior.total_leads === 0) return '';
-  const delta = latest.total_leads - prior.total_leads;
-  const pct = ((delta / prior.total_leads) * 100).toFixed(0);
-  const isUp = delta >= 0;
-  const arrow = isUp ? '▲' : '▼';
-  const sign = isUp ? '+' : '';
-  return `<div class="trend-badge ${isUp ? 'up' : 'down'}">${arrow} ${sign}${pct}% MoM leads (${prior.month}: ${prior.total_leads} → ${latest.month}: ${latest.total_leads})</div>`;
-}
-
-function renderGadsCallout(r: ReportData): string {
-  const gads = r.by_source.find((s) => s.source === 'gads_lp');
-  if (!gads || gads.leads > 0) return '';
-  return `<div class="callout callout-warn">
-    <strong>Google Ads (gads_lp) shows 0 leads</strong> — known LP→Attio sync gap (15/35 form rows failed to sync), not a true zero. Funnel is currently bison_cold-only.
-  </div>`;
-}
-
-function renderBySource(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const rows = r.monthly.map((m) => `
-    <tr>
-      <td>${m.month}</td>
-      <td>${fmt(m.leads_by_source.gads_lp)}</td>
-      <td>${fmt(m.leads_by_source.bison_cold)}</td>
-      <td>${fmt(m.total_leads)}</td>
-    </tr>`).join('');
-  return `<section><div class="container">
-    <span class="section-num">04 · Source mix</span>
-    <h2>Inbound leads by source</h2>
-    ${renderMomTrend(r)}
-    ${renderGadsCallout(r)}
-    <div class="card"><canvas id="chart-by-source" height="340"></canvas></div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>gads_lp</th><th>bison_cold</th><th>Total</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div></section>`;
-}
-
-function renderOutreach(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  if (!r.outreach) return '';
-  const o = r.outreach as OutreachData;
-  const campaignRows = o.campaigns.map((c) => `
-    <tr>
-      <td>${c.name}</td>
-      <td><span class="tag${c.status === 'active' ? ' tag-green' : ' tag-outline'}">${c.status}</span></td>
-      <td>${fmt(c.emails_sent)}</td>
-      <td>${fmt(c.total_leads_contacted)}</td>
-      <td>${fmt(c.replied)}</td>
-      <td>${fmt(c.interested)}</td>
-      <td>${fmt(c.reply_rate, { pct: true })}</td>
-    </tr>`).join('');
-  return `<section><div class="container">
-    <span class="section-num">07 · Cold Email Outreach</span>
-    <h2>Cold email activity</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">${fmt(o.emails_sent)}</div><div class="stat-label">Emails Sent</div></div>
-      <div class="stat"><div class="stat-num">${fmt(o.total_leads_contacted)}</div><div class="stat-label">Leads Contacted</div></div>
-      <div class="stat"><div class="stat-num">${fmt(o.reply_rate, { pct: true })}</div><div class="stat-label">Reply Rate</div></div>
-      <div class="stat"><div class="stat-num">${fmt(o.positive_reply_rate, { pct: true })}</div><div class="stat-label">Positive-Reply Rate</div></div>
-    </div>
-    <div class="card" style="margin-top: 24px; overflow-x: auto;">
-      <table>
-        <thead>
-          <tr><th>Campaign</th><th>Status</th><th>Sent</th><th>Contacted</th><th>Replied</th><th>Interested</th><th>Reply Rate</th></tr>
-        </thead>
-        <tbody>${campaignRows}</tbody>
-      </table>
-    </div>
-    <p style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">Open rate is not tracked — campaigns use plain-text sends with open tracking disabled.</p>
-  </div></section>`;
-}
-
-function renderMql(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const rows = r.monthly.map((m) => `
-    <tr>
-      <td>${m.month}</td>
-      <td>${fmt(m.mql_by_source.gads_lp)}</td>
-      <td>${fmt(m.mql_by_source.bison_cold)}</td>
-      <td>${fmt(m.mql_rate, { pct: true })}</td>
-    </tr>`).join('');
-  return `<section><div class="container">
-    <span class="section-num">05 · MQL</span>
-    <h2>Marketing-qualified leads (Booked Call)</h2>
-    <div class="card"><canvas id="chart-mql-by-source" height="180"></canvas></div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>MQL (gads)</th><th>MQL (bison)</th><th>MQL Rate</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div></section>`;
-}
-
-function renderSql(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const rows = r.monthly.map((m) => `
-    <tr>
-      <td>${m.month}</td>
-      <td>${fmt(m.sql_stage_split.proposal_sent)}</td>
-      <td>${fmt(m.sql_stage_split.negotiating)}</td>
-      <td>${fmt(m.sql_stage_split.closed_won)}</td>
-      <td>${fmt(m.sql_rate, { pct: true })}</td>
-    </tr>`).join('');
-  return `<section><div class="container">
-    <span class="section-num">06 · SQL</span>
-    <h2>Sales-qualified deals (Proposal Sent · Negotiating · Closed Won)</h2>
-    <div class="grid-2">
-      <div class="card"><canvas id="chart-sql-donut" height="180"></canvas></div>
-      <div class="card">
-        <h3>Current month split</h3>
-        <p><span class="tag">Proposal Sent</span> ${r.sql_stage_split.proposal_sent}</p>
-        <p><span class="tag tag-blue">Negotiating</span> ${r.sql_stage_split.negotiating}</p>
-        <p><span class="tag tag-green">Closed Won</span> ${r.sql_stage_split.closed_won}</p>
-      </div>
-    </div>
-    <table style="margin-top: 24px;">
-      <thead><tr><th>Month</th><th>Proposal Sent</th><th>Negotiating</th><th>Closed Won</th><th>SQL Rate</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div></section>`;
-}
-
-function renderCohort(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  const allInsufficient = r.cohort_cpa.every((c) => c.insufficient_data);
-  const inner = allInsufficient
-    ? `<div class="callout callout-info"><strong>Insufficient data</strong> — N+90 cohort CPA requires 90 days post-launch. Launch: ${r.launch_date}. Available: ${r.cohort_cpa.length > 0 ? r.cohort_cpa[r.cohort_cpa.length - 1].cohort_month : '—'}.</div>`
-    : `<table><thead><tr><th>Cohort</th><th>Spend (N−3)</th><th>Wins</th><th>CPA</th></tr></thead><tbody>${r.cohort_cpa.map((c) => `
-      <tr><td>${c.cohort_month}</td><td>${fmt(c.spend_n_minus_3, { currency: true })}</td><td>${fmt(c.wins)}</td><td>${c.insufficient_data ? '<span class="tag tag-outline">pending</span>' : fmt(c.cpa, { currency: true })}</td></tr>`).join('')}</tbody></table>`;
-  return `<section><div class="container">
-    <span class="section-num">07 · Cohort CPA</span>
-    <h2>Deals closed — N+90 cohort</h2>
-    ${inner}
-  </div></section>`;
-}
-
-function renderCpaPayback(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  void r; void fmt;
-  return `<section><div class="container">
-    <span class="section-num">08 · CPA & Payback</span>
-    <h2>CPA by source + payback</h2>
-    <div class="card"><canvas id="chart-cohort-line" height="100"></canvas></div>
-    <p style="margin-top: 16px;">Payback calculation requires gross-margin input from the client. Awaiting target.</p>
-  </div></section>`;
-}
-
-function renderLeadLog(r: ReportData): string {
-  const rows = r.lead_log.slice(0, 50).map((l) => `
-    <tr>
-      <td><span class="signal-time">${l.created_at.slice(0, 10)}</span></td>
-      <td><code>${l.email_hash}</code></td>
-      <td>${l.source}</td>
-      <td>${l.is_mql ? '<span class="tag tag-green">MQL</span>' : '<span class="tag tag-outline">—</span>'}</td>
-      <td>${l.is_sql ? '<span class="tag tag-blue">SQL</span>' : '<span class="tag tag-outline">—</span>'}</td>
-      <td>${l.current_stage}</td>
-    </tr>`).join('') || '<tr><td colspan="6" style="text-align: center; color: #999;">No leads in window</td></tr>';
-  return `<section><div class="container">
-    <span class="section-num">09 · Lead log</span>
-    <h2>Recent leads (last 50)</h2>
-    <table>
-      <thead><tr><th>Created</th><th>Email</th><th>Source</th><th>MQL?</th><th>SQL?</th><th>Stage</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div></section>`;
-}
-
-function renderDefinitions(): string {
-  return `<section><div class="container">
-    <span class="section-num">10 · Definitions</span>
-    <h2>How these metrics are defined</h2>
-    <div class="grid-2">
-      <div class="card"><h4>MQL</h4><p>Lead has reached Attio Leads stage <code>Booked Call</code>. CPG-specific override of the SOP-generic Fit+Intent ≥ 60.</p></div>
-      <div class="card"><h4>SQL</h4><p>Deal has reached <code>Proposal Sent</code>, <code>Negotiating</code>, or <code>Closed Won</code>. CPG-specific override of the SOP-generic BANT-lite.</p></div>
-    </div>
-    <p style="margin-top: 16px; font-size: 0.85em; color: var(--muted);">Funnel counts in-scope channels only — Google Ads (<code>gads_lp</code>) and bison cold email (<code>bison_cold</code>). Contacts from other sources are excluded.</p>
-    <p style="margin-top: 24px; font-size: 0.85em; color: var(--muted);">Full rubric: <code>kamg-ops/clients/cpg-affiliate/metrics-rubric.md</code></p>
-  </div></section>`;
-}
-
-function renderCosts(r: ReportData, fmt: (n: number | null, opts?: { currency?: boolean; pct?: boolean }) => string): string {
-  if (!r.costs) return '';
-  const c = r.costs as CostsData;
-  const monthRows = c.months.map((m) => `
-    <tr>
-      <td>${m.month}</td>
-      <td>${fmt(m.total, { currency: true })}</td>
-      <td>${fmt(m.leads)}</td>
-      <td>${fmt(m.cpl, { currency: true })}</td>
-    </tr>`).join('');
-  const includedNote = c.line_labels.length > 0
-    ? `Included: ${c.line_labels.join(', ')}. Google Ads and Attio line items will be added as costs are confirmed.`
-    : 'No cost line items configured.';
-  return `<section><div class="container">
-    <span class="section-num">08 · Spend &amp; Efficiency</span>
-    <h2>Cost per lead &amp; acquisition</h2>
-    <div class="metric-grid">
-      <div class="stat"><div class="stat-num">${fmt(c.total_cost, { currency: true })}</div><div class="stat-label">Total Spend</div></div>
-      <div class="stat"><div class="stat-num">${fmt(c.blended_cpl, { currency: true })}</div><div class="stat-label">Blended CPL</div></div>
-      <div class="stat"><div class="stat-num">${fmt(c.blended_cpa, { currency: true })}</div><div class="stat-label">Blended CPA</div></div>
-    </div>
-    <div class="card" style="margin-top: 24px; overflow-x: auto;">
-      <table>
-        <thead><tr><th>Month</th><th>Spend</th><th>Leads</th><th>CPL</th></tr></thead>
-        <tbody>${monthRows}</tbody>
-      </table>
-    </div>
-    <p style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">${includedNote}</p>
-  </div></section>`;
-}
-
-// Suppress unused-function warnings for sections not yet wired into renderHtml
-void renderMonthlyTable;
-void renderCohort;
-void renderCpaPayback;
-void renderLeadLog;
+// Keep these exports to suppress "unused" warnings — they may be imported by tests or other render paths
+export { renderHtml as default };
