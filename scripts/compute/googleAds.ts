@@ -36,6 +36,35 @@ function num(raw: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+import type { GoogleAdsData } from "./types";
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function aggregateGoogleAds(daily: GoogleAdsDaily[]): GoogleAdsData {
+  const sorted = [...daily].sort((a, b) => a.date.localeCompare(b.date));
+  const impressions = sorted.reduce((s, d) => s + d.impressions, 0);
+  const clicks = sorted.reduce((s, d) => s + d.clicks, 0);
+  const conversions = sorted.reduce((s, d) => s + d.conversions, 0);
+  const est_spend = round2(sorted.reduce((s, d) => s + d.est_cost, 0));
+  return {
+    window: {
+      start: sorted[0]?.date ?? "",
+      end: sorted[sorted.length - 1]?.date ?? "",
+    },
+    daily: sorted,
+    totals: {
+      impressions,
+      clicks,
+      ctr: impressions > 0 ? clicks / impressions : 0,
+      avg_cpc: clicks > 0 ? round2(est_spend / clicks) : 0,
+      conversions,
+      est_spend,
+      est_cost_per_conv: conversions > 0 ? round2(est_spend / conversions) : null,
+    },
+    spend_estimated: true,
+  };
+}
+
 /** Parse the Google Ads "Time series" CSV export into daily rows. */
 export function parseGoogleAdsCsv(csv: string): GoogleAdsDaily[] {
   const lines = csv.split(/\r?\n/).filter((l) => l.trim().length > 0);
