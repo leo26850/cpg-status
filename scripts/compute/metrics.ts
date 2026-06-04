@@ -36,6 +36,59 @@ export function dedupLeads(leads: RawLead[]): RawLead[] {
   return Array.from(byEmail.values());
 }
 
+// ── Real Google Ads leads from BigQuery lp_form_submissions ──────────────────
+// The Attio lead_source is unreliable for Google Ads (LP-created gads_lp leads
+// get merged into prospects' bison_cold leads, and every LP fill is stamped
+// gads_lp). BigQuery lp_form_submissions is the immutable, complete source. A
+// "real Google Ads" submission is one with source='Google Ads' OR a gclid.
+
+export type LpSubmissionRow = {
+  email: string;
+  submitted_at: { value: string } | string;
+  source: string;
+  gclid: string | null;
+};
+
+// Internal/QA test fills, applied on top of isJunkEmail (which already drops
+// kasandz.com / example.com / +test). These are the LP-only QA patterns
+// (deploy/optionals smoke tests, full-payload test) that would otherwise
+// inflate the client-facing Google Ads count.
+const GADS_TEST_EMAIL_REGEX = /(\+|-)test|full-payload|smoke|^qa-/i;
+const GADS_TEST_DOMAINS = new Set(['kamg-deploytest.com', 'kamg-optionals-test.com']);
+
+function isGadsTestEmail(lowerEmail: string): boolean {
+  const [local, domain] = lowerEmail.split('@');
+  if (domain && GADS_TEST_DOMAINS.has(domain)) return true;
+  return GADS_TEST_EMAIL_REGEX.test(local ?? '');
+}
+
+function lpSubmittedIso(ts: { value: string } | string): string {
+  return typeof ts === 'string' ? ts : ts.value;
+}
+
+export function gadsLeadsFromLp(rows: LpSubmissionRow[]): {
+  emails: Set<string>;
+  byMonth: Record<string, number>;
+  total: number;
+} {
+  // First-touch month per distinct email: the earliest real-GA submission.
+  const firstTouchMonth = new Map<string, string>();
+  for (const r of rows) {
+    const isRealGads = r.source === 'Google Ads' || !!(r.gclid && r.gclid.trim());
+    if (!isRealGads) continue;
+    const email = (r.email ?? '').toLowerCase().trim();
+    if (!email || isJunkEmail(email) || isGadsTestEmail(email)) continue;
+    const month = lpSubmittedIso(r.submitted_at).slice(0, 7); // 'YYYY-MM'
+    const prev = firstTouchMonth.get(email);
+    if (!prev || month < prev) firstTouchMonth.set(email, month);
+  }
+  const byMonth: Record<string, number> = {};
+  for (const month of firstTouchMonth.values()) {
+    byMonth[month] = (byMonth[month] ?? 0) + 1;
+  }
+  return { emails: new Set(firstTouchMonth.keys()), byMonth, total: firstTouchMonth.size };
+}
+
 export type RawDeal = {
   id: string;
   associated_company: string | null;

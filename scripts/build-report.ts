@@ -3,7 +3,7 @@ import { BigQuery } from '@google-cloud/bigquery';
 import { OAuth2Client } from 'google-auth-library';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { aggregateMonthly, dedupLeads, toChannel, classifyMql, classifySql } from './compute/metrics.js';
+import { aggregateMonthly, dedupLeads, toChannel, classifyMql, classifySql, gadsLeadsFromLp, type RawLead, type LpSubmissionRow } from './compute/metrics.js';
 import { computeCohortCpa } from './compute/cohort.js';
 import { fetchAllRecords, attioString, attioTimestamp, attioStage } from './attio/client.js';
 import { fetchAllCampaigns } from './bison/client.js';
@@ -180,7 +180,7 @@ async function main(): Promise<void> {
   console.log(`  → ${dealsWithEmail}/${deals.length} deals resolved an email via People map`);
 
   console.log('Querying BQ: lp_form_submissions...');
-  const lpSubmissions = await runQuery<{ email: string; submitted_at: { value: string } | string; source: string }>(
+  const lpSubmissions = await runQuery<LpSubmissionRow>(
     bq,
     'scripts/queries/lp_submissions.sql',
     { start_date: '2026-05-01' },
@@ -215,33 +215,76 @@ async function main(): Promise<void> {
   // contacts (manual outreach / existing contacts / sales list) are excluded from
   // MQL/SQL/Closed Won per the CPG rubric — 'other' is not part of the funnel.
   const dedupLeadsArr = dedupLeads(leads);
+
+  // Google Ads leads come from BigQuery lp_form_submissions (real GA = source
+  // 'Google Ads' OR a gclid present, test fills excluded), NOT from the Attio
+  // lead_source: Attio merges gads_lp leads into prospects' bison_cold leads and
+  // stamps lead_source=gads_lp on every LP fill, so it is both lossy and
+  // over-counting. Bison stays sourced from Attio.
+  const gads = gadsLeadsFromLp(lpSubmissions);
+  const bisonLeads = dedupLeadsArr.filter((l) => toChannel(l.lead_source) === 'bison_cold');
+
+  // Synthetic gads leads — one per real-GA email in its first-touch month — so
+  // aggregateMonthly produces correct leads_by_source / total_leads / CPL in one
+  // place. These never enter lead_log (built from Attio leads only) and carry
+  // synthetic emails that match no deal (gads deal attribution is handled via
+  // sourceByEmail below).
+  const gadsSyntheticLeads: RawLead[] = [];
+  let gi = 0;
+  for (const [month, count] of Object.entries(gads.byMonth)) {
+    for (let k = 0; k < count; k++) {
+      gadsSyntheticLeads.push({
+        id: `gads-bq-${month}-${gi}`,
+        email: `gads-bq-${month}-${gi}@gads.synthetic`,
+        created_at: `${month}-15T00:00:00.000Z`,
+        lead_source: 'gads_lp',
+        stage: 'New',
+      });
+      gi++;
+    }
+  }
+
+  // Email→channel map: Attio classification, with real-GA emails forced to
+  // gads_lp so their Attio deals classify as gads_lp for MQL/SQL.
   const sourceByEmail = new Map(dedupLeadsArr.map((l) => [(l.email ?? '').toLowerCase().trim(), toChannel(l.lead_source)]));
+  for (const e of gads.emails) sourceByEmail.set(e, 'gads_lp');
+
   const isInScope = (ch: Channel): boolean => ch === 'gads_lp' || ch === 'bison_cold';
   const dealChannel = (d: { associated_lead_email: string | null }): Channel =>
     sourceByEmail.get((d.associated_lead_email ?? '').toLowerCase().trim()) ?? 'other';
-  const inScopeLeads = dedupLeadsArr.filter((l) => isInScope(toChannel(l.lead_source)));
   const inScopeDeals = deals.filter((d) => isInScope(dealChannel(d)));
 
-  // Compute metrics on the scoped sets
-  const monthly = aggregateMonthly(inScopeLeads, inScopeDeals, costs);
+  // Funnel leads = bison_cold (Attio) + real Google Ads (BigQuery).
+  const funnelLeads: RawLead[] = [...bisonLeads, ...gadsSyntheticLeads];
+  const monthly = aggregateMonthly(funnelLeads, inScopeDeals, costs);
   const cohort = computeCohortCpa(monthly, launchDate, today);
 
-  const total_leads = inScopeLeads.length;
-  const mql = inScopeLeads.filter((l) => classifyMql(l.stage)).length;
+  const total_leads = bisonLeads.length + gads.total;
+  // gads lead-based MQL is 0 (synthetic leads are stage 'New'); real GA volume
+  // is ~1 today and any gads MQL/SQL would surface via the deal path below.
+  const mql = bisonLeads.filter((l) => classifyMql(l.stage)).length;
   const sql = inScopeDeals.filter((d) => classifySql(d.stage)).length;
   const closed_won = inScopeDeals.filter((d) => d.stage === 'Closed Won').length;
   const currentMonthRow = monthly[monthly.length - 1];
   const cpl = currentMonthRow?.cpl ?? null;
   const cpa = cohort.find((c) => !c.insufficient_data && c.cpa !== null)?.cpa ?? null;
 
-  const sources: Channel[] = ['gads_lp', 'bison_cold'];
-  const by_source = sources.map((s) => ({
-    source: s,
-    leads: inScopeLeads.filter((l) => toChannel(l.lead_source) === s).length,
-    mql: inScopeLeads.filter((l) => toChannel(l.lead_source) === s && classifyMql(l.stage)).length,
-    sql: inScopeDeals.filter((d) => dealChannel(d) === s && classifySql(d.stage)).length,
-    closed_won: inScopeDeals.filter((d) => dealChannel(d) === s && d.stage === 'Closed Won').length,
-  }));
+  const by_source = [
+    {
+      source: 'gads_lp' as Channel,
+      leads: gads.total,
+      mql: 0,
+      sql: inScopeDeals.filter((d) => dealChannel(d) === 'gads_lp' && classifySql(d.stage)).length,
+      closed_won: inScopeDeals.filter((d) => dealChannel(d) === 'gads_lp' && d.stage === 'Closed Won').length,
+    },
+    {
+      source: 'bison_cold' as Channel,
+      leads: bisonLeads.length,
+      mql: bisonLeads.filter((l) => classifyMql(l.stage)).length,
+      sql: inScopeDeals.filter((d) => dealChannel(d) === 'bison_cold' && classifySql(d.stage)).length,
+      closed_won: inScopeDeals.filter((d) => dealChannel(d) === 'bison_cold' && d.stage === 'Closed Won').length,
+    },
+  ];
 
   const { hashEmail } = await import('./render/hashing.js');
   const recentLeads = dedupLeadsArr
@@ -255,7 +298,10 @@ async function main(): Promise<void> {
     return {
       created_at: l.created_at,
       email_hash: hashEmail(l.email),
-      source: toChannel(l.lead_source),
+      // gads_lp only for real-GA emails (BigQuery); Attio lead_source=gads_lp is
+      // unreliable (every LP fill is stamped gads_lp), so non-real-GA falls back
+      // to bison_cold or other — consistent with the funnel scoping above.
+      source: gads.emails.has(key) ? 'gads_lp' : toChannel(l.lead_source) === 'bison_cold' ? 'bison_cold' : 'other',
       is_mql: classifyMql(l.stage),
       is_sql: deal ? classifySql(deal.stage) : false,
       current_stage: deal?.stage ?? l.stage,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dedupLeads, isJunkEmail, type RawLead, toChannel, classifyMql, classifySql, type RawDeal, aggregateMonthly } from '../scripts/compute/metrics';
+import { dedupLeads, isJunkEmail, type RawLead, toChannel, classifyMql, classifySql, type RawDeal, aggregateMonthly, gadsLeadsFromLp } from '../scripts/compute/metrics';
 import type { MonthlyCost } from '../scripts/compute/types';
 
 describe('isJunkEmail', () => {
@@ -156,5 +156,59 @@ describe('aggregateMonthly', () => {
     expect(apr.leads_by_source.gads_lp).toBe(2);
     expect(apr.leads_by_source.bison_cold).toBe(2);
     expect(apr.leads_by_source.other).toBe(0);
+  });
+});
+
+describe('gadsLeadsFromLp', () => {
+  type Row = { email: string; submitted_at: { value: string } | string; source: string; gclid: string | null };
+  const row = (o: Partial<Row> & { email: string }): Row => ({
+    submitted_at: '2026-05-15T00:00:00Z',
+    source: 'Direct',
+    gclid: null,
+    ...o,
+  });
+
+  it('keeps rows with source=Google Ads or a gclid; drops the rest', () => {
+    const out = gadsLeadsFromLp([
+      row({ email: 'ga@acme.io', source: 'Google Ads' }),
+      row({ email: 'click@acme.io', source: 'Direct', gclid: 'Cj0abc' }),
+      row({ email: 'organic@acme.io', source: 'Direct', gclid: null }),
+    ]);
+    expect(out.emails.has('ga@acme.io')).toBe(true);
+    expect(out.emails.has('click@acme.io')).toBe(true);
+    expect(out.emails.has('organic@acme.io')).toBe(false);
+    expect(out.total).toBe(2);
+  });
+
+  it('excludes internal test/QA fills, keeps the one real external lead', () => {
+    const out = gadsLeadsFromLp([
+      row({ email: 'lp-attio-test-1@kasandz.com', source: 'Google Ads', gclid: 'x' }),
+      row({ email: 'team+ecom@kasandz.com', source: 'Google Ads' }),
+      row({ email: 'leoandre50+full-payload-test@gmail.com', source: 'Google Ads', gclid: 'x' }),
+      row({ email: 'qa-deploy-smoke@kamg-deploytest.com', source: 'Google Ads', gclid: 'x' }),
+      row({ email: 'qa-optionals-smoke@kamg-optionals-test.com', source: 'Google Ads', gclid: 'x' }),
+      row({ email: 'chiefjones@safesecureworldwide.com', source: 'Google Ads', gclid: 'Cj0real' }),
+    ]);
+    expect(out.total).toBe(1);
+    expect([...out.emails]).toEqual(['chiefjones@safesecureworldwide.com']);
+  });
+
+  it('dedups by email and buckets in the first-touch month', () => {
+    const out = gadsLeadsFromLp([
+      row({ email: 'repeat@acme.io', source: 'Google Ads', submitted_at: { value: '2026-06-02T10:00:00Z' } }),
+      row({ email: 'repeat@acme.io', source: 'Google Ads', submitted_at: { value: '2026-05-20T10:00:00Z' } }),
+    ]);
+    expect(out.total).toBe(1);
+    expect(out.byMonth['2026-05']).toBe(1);
+    expect(out.byMonth['2026-06']).toBeUndefined();
+  });
+
+  it('byMonth sums to total', () => {
+    const out = gadsLeadsFromLp([
+      row({ email: 'a@acme.io', source: 'Google Ads', submitted_at: '2026-05-01T00:00:00Z' }),
+      row({ email: 'b@acme.io', source: 'Google Ads', submitted_at: '2026-06-01T00:00:00Z' }),
+    ]);
+    const sum = Object.values(out.byMonth).reduce((s, n) => s + n, 0);
+    expect(sum).toBe(out.total);
   });
 });
