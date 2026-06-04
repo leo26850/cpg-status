@@ -9,6 +9,8 @@ import { fetchAllRecords, attioString, attioTimestamp, attioStage } from './atti
 import { fetchAllCampaigns } from './bison/client.js';
 import { aggregateOutreach } from './compute/outreach.js';
 import { aggregateCosts } from './compute/costs.js';
+import { parseGoogleAdsCsv, aggregateGoogleAds } from './compute/googleAds.js';
+import { buildScorecard, computeConversionRates } from './compute/scorecard.js';
 import type { Channel, MonthlyCost, ReportData, LeadLogRow, CostLineItem } from './compute/types.js';
 
 const PROJECT = 'cpg-data-warehouse';
@@ -305,6 +307,23 @@ async function main(): Promise<void> {
     costsData = null;
   }
 
+  // --- Google Ads (Phase 1: account-level CSV; spend ESTIMATED) ---
+  const gadsCsvPath = 'data/google_ads_export.csv';
+  let googleAds = null;
+  if (existsSync(gadsCsvPath)) {
+    const daily = parseGoogleAdsCsv(readFileSync(gadsCsvPath, 'utf8'));
+    googleAds = aggregateGoogleAds(daily);
+  } else {
+    console.warn(`[build] ${gadsCsvPath} missing — Google Ads panel will show no data`);
+  }
+
+  // --- Channel scorecard + conversion rates ---
+  const scorecard = buildScorecard(by_source, {
+    gadsEstSpend: googleAds?.totals.est_spend ?? 0,
+    channelCosts: {}, // populate from channel-tagged marketing_costs.json items if/when present
+  });
+  const conversion_rates = computeConversionRates({ leads: total_leads, mql, sql, closed_won });
+
   const report: ReportData = {
     generated_at: new Date().toISOString(),
     window: windowRange,
@@ -319,6 +338,9 @@ async function main(): Promise<void> {
     stale: false,
     outreach,
     costs: costsData,
+    google_ads: googleAds,
+    scorecard,
+    conversion_rates,
   };
 
   writeFileSync('data/report.json', JSON.stringify(report, null, 2));
