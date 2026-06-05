@@ -1,102 +1,162 @@
 import { describe, it, expect } from 'vitest';
 import { aggregateTotalPipeline } from '../scripts/compute/pipeline';
 
-// Known snapshot counts (from live Attio data as of spec):
-// Call Scheduled 11, Discovery Call Done 68, Follow Up Call Done 51,
-// Following Up 15, Proposal Sent 15, Negotiating 18, Closed Won 43,
-// Closed Lost 8, Disqualified 6  → total = 235
-function buildSnapshot(): string[] {
-  const entries: Array<[string, number]> = [
-    ['Call Scheduled', 11],
-    ['Discovery Call Done', 68],
-    ['Follow Up Call Done', 51],
-    ['Following Up', 15],
-    ['Proposal Sent', 15],
-    ['Negotiating', 18],
-    ['Closed Won', 43],
-    ['Closed Lost', 8],
-    ['Disqualified', 6],
+// Test period matching the CPG launch window
+const TEST_PERIOD = { start: '2026-05-11', end: '2026-06-04' };
+
+/**
+ * Fixture:
+ *  - 6 open deals across stages (Call Scheduled: 2, Discovery Call Done: 2, Proposal Sent: 1, Negotiating: 1)
+ *  - 2 Closed Won with active_from IN window (2026-05-19, 2026-06-02)
+ *  - 37 Closed Won with active_from 2026-04-29 (OUT of window — April migration cluster)
+ *  - 1 Closed Lost with active_from IN window (2026-05-20)
+ *  - 1 Disqualified with active_from 2026-04-01 (OUT of window)
+ *
+ * Total: 6 + 2 + 37 + 1 + 1 = 47
+ */
+function buildFixture(): { stage: string; stage_active_from: string }[] {
+  const deals: { stage: string; stage_active_from: string }[] = [];
+
+  // 6 open deals
+  const openEntries: Array<[string, number, string]> = [
+    ['Call Scheduled',        2, '2026-05-15'],
+    ['Discovery Call Done',   2, '2026-05-18'],
+    ['Proposal Sent',         1, '2026-05-25'],
+    ['Negotiating',           1, '2026-06-01'],
   ];
-  const out: string[] = [];
-  for (const [stage, n] of entries) {
-    for (let i = 0; i < n; i++) out.push(stage);
+  for (const [stage, count, active_from] of openEntries) {
+    for (let i = 0; i < count; i++) deals.push({ stage, stage_active_from: active_from });
   }
-  return out;
+
+  // 2 Closed Won IN window
+  deals.push({ stage: 'Closed Won', stage_active_from: '2026-05-19' });
+  deals.push({ stage: 'Closed Won', stage_active_from: '2026-06-02' });
+
+  // 37 Closed Won OUT of window (April migration)
+  for (let i = 0; i < 37; i++) {
+    deals.push({ stage: 'Closed Won', stage_active_from: '2026-04-29' });
+  }
+
+  // 1 Closed Lost IN window
+  deals.push({ stage: 'Closed Lost', stage_active_from: '2026-05-20' });
+
+  // 1 Disqualified OUT of window
+  deals.push({ stage: 'Disqualified', stage_active_from: '2026-04-01' });
+
+  return deals;
 }
 
-describe('aggregateTotalPipeline — snapshot', () => {
-  const snapshot = buildSnapshot();
-  const result = aggregateTotalPipeline(snapshot);
+describe('aggregateTotalPipeline — fixture (period-scoped closes)', () => {
+  const fixture = buildFixture();
+  const result = aggregateTotalPipeline(fixture, TEST_PERIOD);
 
-  it('total = 235', () => {
-    expect(result.total).toBe(235);
+  it('total_all_time = 47', () => {
+    expect(result.total_all_time).toBe(47);
   });
 
-  it('open_active = 178 (all except Closed Won / Closed Lost / Disqualified)', () => {
-    expect(result.open_active).toBe(178);
+  it('open_active = 6', () => {
+    expect(result.open_active).toBe(6);
   });
 
-  it('closed_won = 43', () => {
-    expect(result.closed_won).toBe(43);
+  it('closed_won_period = 2 (excludes 37 April-migration deals)', () => {
+    expect(result.closed_won_period).toBe(2);
   });
 
-  it('closed_lost_dq = 14 (Closed Lost 8 + Disqualified 6)', () => {
-    expect(result.closed_lost_dq).toBe(14);
+  it('closed_lost_dq_period = 1 (only Closed Lost in window; Disqualified out)', () => {
+    expect(result.closed_lost_dq_period).toBe(1);
   });
 
-  it('close_rate ≈ 0.754 (43 / 57)', () => {
-    expect(result.close_rate).toBeCloseTo(43 / 57, 3);
+  it('win_rate_period ≈ 0.667 (2 / 3)', () => {
+    expect(result.win_rate_period).toBeCloseTo(2 / 3, 3);
   });
 
-  it('by_stage follows canonical order', () => {
-    const stageNames = result.by_stage.map((r) => r.stage);
-    expect(stageNames).toEqual([
+  it('by_stage_open sums to 6', () => {
+    const sum = result.by_stage_open.reduce((acc, r) => acc + r.count, 0);
+    expect(sum).toBe(6);
+  });
+
+  it('by_stage_open contains only open stages', () => {
+    const stageNames = result.by_stage_open.map((r) => r.stage);
+    expect(stageNames).not.toContain('Closed Won');
+    expect(stageNames).not.toContain('Closed Lost');
+    expect(stageNames).not.toContain('Disqualified');
+  });
+
+  it('by_stage_open follows canonical OPEN_STAGES order', () => {
+    const names = result.by_stage_open.map((r) => r.stage);
+    expect(names).toEqual([
       'Call Scheduled',
       'Discovery Call Done',
-      'Follow Up Call Done',
-      'Following Up',
       'Proposal Sent',
       'Negotiating',
-      'Closed Won',
-      'Closed Lost',
-      'Disqualified',
     ]);
   });
 
-  it('by_stage counts match snapshot', () => {
-    const map = Object.fromEntries(result.by_stage.map((r) => [r.stage, r.count]));
-    expect(map['Call Scheduled']).toBe(11);
-    expect(map['Discovery Call Done']).toBe(68);
-    expect(map['Closed Won']).toBe(43);
-    expect(map['Disqualified']).toBe(6);
+  it('by_stage_open excludes stages with count 0', () => {
+    // Follow Up Call Done and Following Up have no deals in fixture
+    const names = result.by_stage_open.map((r) => r.stage);
+    expect(names).not.toContain('Follow Up Call Done');
+    expect(names).not.toContain('Following Up');
+  });
+
+  it('period is passed through correctly', () => {
+    expect(result.period).toEqual(TEST_PERIOD);
   });
 });
 
 describe('aggregateTotalPipeline — edge cases', () => {
-  it('returns 0 close_rate when denominator is 0', () => {
-    const result = aggregateTotalPipeline(['Call Scheduled', 'Following Up']);
-    expect(result.close_rate).toBe(0);
-    expect(result.closed_won).toBe(0);
-    expect(result.closed_lost_dq).toBe(0);
+  it('returns win_rate_period = 0 when denominator is 0', () => {
+    const deals = [
+      { stage: 'Call Scheduled', stage_active_from: '2026-05-15' },
+      { stage: 'Following Up',   stage_active_from: '2026-05-16' },
+    ];
+    const result = aggregateTotalPipeline(deals, TEST_PERIOD);
+    expect(result.win_rate_period).toBe(0);
+    expect(result.closed_won_period).toBe(0);
+    expect(result.closed_lost_dq_period).toBe(0);
   });
 
   it('handles empty input', () => {
-    const result = aggregateTotalPipeline([]);
-    expect(result.total).toBe(0);
-    expect(result.by_stage).toHaveLength(0);
-    expect(result.close_rate).toBe(0);
+    const result = aggregateTotalPipeline([], TEST_PERIOD);
+    expect(result.total_all_time).toBe(0);
+    expect(result.open_active).toBe(0);
+    expect(result.by_stage_open).toHaveLength(0);
+    expect(result.win_rate_period).toBe(0);
   });
 
-  it('appends unknown stages after canonical ones', () => {
-    const result = aggregateTotalPipeline(['Closed Won', 'Mystery Stage', 'Call Scheduled']);
-    const names = result.by_stage.map((r) => r.stage);
-    expect(names.indexOf('Call Scheduled')).toBeLessThan(names.indexOf('Closed Won'));
-    expect(names[names.length - 1]).toBe('Mystery Stage');
+  it('empty stage_active_from is not counted as in-window', () => {
+    const deals = [
+      { stage: 'Closed Won', stage_active_from: '' },
+      { stage: 'Closed Lost', stage_active_from: '' },
+    ];
+    const result = aggregateTotalPipeline(deals, TEST_PERIOD);
+    expect(result.closed_won_period).toBe(0);
+    expect(result.closed_lost_dq_period).toBe(0);
+    expect(result.win_rate_period).toBe(0);
+    // They still count toward total
+    expect(result.total_all_time).toBe(2);
   });
 
-  it('open_active excludes all three terminal stages', () => {
-    const stages = ['Closed Won', 'Closed Won', 'Closed Lost', 'Disqualified', 'Negotiating'];
-    const result = aggregateTotalPipeline(stages);
+  it('boundary dates: period.start and period.end are inclusive', () => {
+    const deals = [
+      { stage: 'Closed Won', stage_active_from: '2026-05-11' }, // exactly period.start
+      { stage: 'Closed Won', stage_active_from: '2026-06-04' }, // exactly period.end
+      { stage: 'Closed Won', stage_active_from: '2026-05-10' }, // one day before
+      { stage: 'Closed Won', stage_active_from: '2026-06-05' }, // one day after
+    ];
+    const result = aggregateTotalPipeline(deals, TEST_PERIOD);
+    expect(result.closed_won_period).toBe(2); // only start + end boundaries count
+  });
+
+  it('open_active excludes all terminal stages', () => {
+    const deals = [
+      { stage: 'Closed Won',  stage_active_from: '2026-05-15' },
+      { stage: 'Closed Won',  stage_active_from: '2026-05-16' },
+      { stage: 'Closed Lost', stage_active_from: '2026-05-17' },
+      { stage: 'Disqualified',stage_active_from: '2026-05-18' },
+      { stage: 'Negotiating', stage_active_from: '2026-05-19' },
+    ];
+    const result = aggregateTotalPipeline(deals, TEST_PERIOD);
     expect(result.open_active).toBe(1); // only Negotiating
   });
 });

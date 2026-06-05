@@ -189,26 +189,19 @@ window.CPGCharts = (function () {
     });
   }
 
-  // ===== TOTAL PIPELINE: Deals by stage horizontal bar =====
+  // ===== TOTAL PIPELINE: Active pipeline by stage horizontal bar =====
   function buildPipelineStages() {
     const ctx = document.getElementById('chart-pipeline-stages');
     if (!ctx) return;
     if (!data.total_pipeline) return;
-    const byStage = data.total_pipeline.by_stage;
+    // by_stage_open: only open (non-terminal) stages, current snapshot
+    const byStage = data.total_pipeline.by_stage_open;
+    if (!byStage || byStage.length === 0) return;
     const labels = byStage.map((r) => r.stage);
     const counts = byStage.map((r) => r.count);
 
-    // Color each bar by stage category
-    const CLOSED_WON_COLOR   = '#34d399'; // green
-    const CLOSED_LOST_COLOR  = '#f87171'; // red
-    const DEFAULT_COLOR      = '#f5a623'; // amber
-    const closedLostSet = new Set(['Closed Lost', 'Disqualified']);
-
-    const colors = labels.map((l) => {
-      if (l === 'Closed Won')       return CLOSED_WON_COLOR;
-      if (closedLostSet.has(l))     return CLOSED_LOST_COLOR;
-      return DEFAULT_COLOR;
-    });
+    // All open stages get the same amber color — terminal stages are in KPI tiles, not the chart
+    const colors = labels.map(() => ACCENT);
 
     new Chart(ctx, {
       type: 'bar',
