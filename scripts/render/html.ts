@@ -350,27 +350,27 @@ function totalPipelinePanel(r: ReportData): string {
   }
 
   const kpis = `<div class="kpi-grid">
-    ${kpi(fmtInt(tp.total), 'Total Deals',
-      'Every deal in Attio across all lead sources and all pipeline stages.')}
-    ${kpi(fmtInt(tp.open_active), 'Open / Active',
-      'Deals not yet at a terminal stage — Call Scheduled through Negotiating.')}
-    ${kpi(fmtInt(tp.closed_won), 'Closed Won',
-      'All deals marked Closed Won, regardless of lead source.')}
-    ${kpi(fmtPct(tp.close_rate), 'Close Rate',
-      'Closed Won ÷ (Closed Won + Closed Lost + Disqualified). Excludes still-open deals.')}
+    ${kpi(fmtInt(tp.open_active), 'Open Pipeline',
+      'Deals currently in play — Call Scheduled through Negotiating.')}
+    ${kpi(fmtInt(tp.closed_won_period), 'Closed Won (since launch)',
+      'Deals won since CPG launch (excludes a one-time April data migration).')}
+    ${kpi(fmtPct(tp.win_rate_period), 'Win Rate (since launch)',
+      'Of decided deals since launch: won ÷ (won + lost + disqualified).')}
+    ${kpi(fmtInt(tp.total_all_time), 'Total Deals (all-time)',
+      'Every deal in Attio, including migrated legacy records — shown for context.')}
   </div>`;
 
   const stagesCard = card(
-    'Deals by Stage',
+    'Active Pipeline by Stage',
     `<div style="position:relative;height:320px"><canvas id="chart-pipeline-stages"></canvas></div>`,
-    'Count of all deals at each pipeline stage. All lead sources included.'
+    'Open deals at each active pipeline stage — current snapshot. Terminal stages (Closed Won/Lost/Disqualified) are reported in the KPIs above, not the chart.'
   );
 
   return `<section class="panel" id="panel-totalpipeline" data-panel="totalpipeline">
   <div class="panel-header">
     <div class="panel-eyebrow">06 · Total Pipeline</div>
     <h1>Total Pipeline</h1>
-    <p class="panel-desc">CPG's full sales pipeline across ALL lead sources, shown for context. The Overview, Channels, and Funnel panels are scoped to leads KAMG generated (Google Ads and cold email); this panel is everything.</p>
+    <p class="panel-desc">CPG's full sales pipeline across ALL lead sources, shown for context. Pipeline snapshot is current-state; closes are since-launch (stage active_from ≥ ${tp.period.start}), excluding the April 2026 migration cluster. The Overview, Channels, and Funnel panels are scoped to leads KAMG generated (Google Ads and cold email); this panel is everything.</p>
     <p class="panel-freshness">Window: ${r.window.start} → ${r.window.end}</p>
   </div>
   ${kpis}
@@ -440,6 +440,7 @@ function methodologyPanel(r: ReportData): string {
   <div class="card section-gap">
     <h3>Scope Note: Total Pipeline vs KAMG Panels</h3>
     <p>The <strong>Total Pipeline</strong> panel (06) shows CPG's complete Attio Deals object — all lead sources, all stages. Every other panel (Overview, Channels, Cold Email, Google Ads, Funnel) is scoped exclusively to leads KAMG generated via Google Ads (gads_lp) and cold email (bison_cold). Deals from organic, direct, referral, or other sources appear only in Total Pipeline.</p>
+    <p style="margin-top:10px"><strong>Closed Won &amp; Win Rate methodology (Total Pipeline):</strong> Terminal-stage counts (Closed Won, Closed Lost, Disqualified) use each deal's stage <code>active_from</code> timestamp as the close date. Only deals where <code>active_from</code> falls within the since-launch window (${`${r.launch_date}`} → ${`${r.window.end}`}) are counted. This excludes a one-time April 2026 bulk migration of 37 legacy deals that pre-dates CPG's live operation. Open pipeline counts are a current-state snapshot and are not date-filtered.</p>
   </div>
 
   <div class="callout info section-gap">

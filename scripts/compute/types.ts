@@ -46,18 +46,16 @@ export type { OutreachData, OutreachCampaignRow } from './outreach.js';
 export type { CostsData, CostLineItem, PerMonthCost } from './costs.js';
 
 // --- Total Pipeline (all lead sources, all stages) ---
-export type PipelineStageRow = {
-  stage: string;
-  count: number;
-};
+export type PipelineStageRow = { stage: string; count: number };
 
 export type TotalPipeline = {
-  by_stage: PipelineStageRow[];
-  total: number;
-  open_active: number;
-  closed_won: number;
-  closed_lost_dq: number;
-  close_rate: number;
+  total_all_time: number;            // every deal in Attio (incl migrated legacy)
+  open_active: number;               // deals currently in OPEN stages
+  by_stage_open: PipelineStageRow[]; // OPEN stages only, current snapshot (for the chart)
+  closed_won_period: number;         // Closed Won with active_from within window
+  closed_lost_dq_period: number;     // Closed Lost + Disqualified with active_from within window
+  win_rate_period: number;           // closed_won_period / (closed_won_period + closed_lost_dq_period), 0 if denom 0
+  period: { start: string; end: string };
 };
 
 // --- Google Ads (Phase 1: account-level, from CSV; spend is ESTIMATED) ---

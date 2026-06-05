@@ -167,11 +167,16 @@ async function main(): Promise<void> {
   const deals = attioDealsRaw.map((r) => {
     const personId = getDealPersonId(r);
     const emailFromPerson = personId ? (personEmailMap.get(personId) ?? null) : null;
+    // stage_active_from: the stage status value's active_from timestamp (100% populated per recon).
+    // Raw stage attribute is values.stage[0]; active_from lives directly on that object.
+    const stageEntry = r.values?.stage?.[0] as Record<string, unknown> | undefined;
+    const stageActiveFrom: string = stageEntry?.active_from ? String(stageEntry.active_from).slice(0, 10) : '';
     return {
       id: r.id.record_id,
       associated_company: null,
       associated_lead_email: emailFromPerson,
       stage: attioStage(r, 'stage') ?? '',
+      stage_active_from: stageActiveFrom,
       stage_updated_at: attioTimestamp(r, 'stage_updated_at') ?? r.created_at ?? '',
       created_at: r.created_at ?? '',
       value: null,
@@ -326,8 +331,12 @@ async function main(): Promise<void> {
   const conversion_rates = computeConversionRates({ leads: total_leads, mql, sql, closed_won });
 
   // --- Total Pipeline (all deals, all lead sources) ---
-  const allDealStages = deals.map((d) => d.stage).filter(Boolean);
-  const total_pipeline = aggregateTotalPipeline(allDealStages);
+  // Pass full deal objects with stage_active_from so period-scoped closes can be computed.
+  // windowRange is already defined above as { start: launchDate, end: today }.
+  const allDealObjects = deals
+    .filter((d) => d.stage)
+    .map((d) => ({ stage: d.stage, stage_active_from: d.stage_active_from }));
+  const total_pipeline = aggregateTotalPipeline(allDealObjects, windowRange);
 
   const report: ReportData = {
     generated_at: new Date().toISOString(),
