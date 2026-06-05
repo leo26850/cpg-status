@@ -1,6 +1,6 @@
 # CPG Affiliate · 2026-06 · Lead Funnel
 
-_Generated 2026-06-04T17:34:31.133Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
+_Generated 2026-06-05T00:18:47.899Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
 
 ## Block 1 · Header strip
 
@@ -8,7 +8,7 @@ _Generated 2026-06-04T17:34:31.133Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 |---|---|
 | Client | CPG Affiliate |
 | Month | 2026-06 |
-| Window | 2026-05-11 → 2026-06-04 |
+| Window | 2026-05-11 → 2026-06-05 |
 | Launch date | 2026-05-11 |
 | Target CPL | — |
 | Target CPA | — |
@@ -19,17 +19,17 @@ _Generated 2026-06-04T17:34:31.133Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 | Metric | Value |
 |---|---|
 | Total spend (fully-loaded) | $0 |
-| Leads (deduped) | 11 |
+| Leads (deduped) | 2 |
 | CPL | — |
 
 ## Block 3 · Inbound leads by source
 
 | Source | Count |
 |---|---|
-| gads_lp | 9 |
+| gads_lp | 0 |
 | bison_cold | 2 |
 | Other | 0 |
-| **Total** | **11** |
+| **Total** | **2** |
 
 ## Block 4 · MQL total
 
