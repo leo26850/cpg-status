@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-06-05T00:18:47.899Z",
+  "generated_at": "2026-06-07T08:47:41.435Z",
   "window": {
     "start": "2026-05-11",
-    "end": "2026-06-05"
+    "end": "2026-06-07"
   },
   "launch_date": "2026-05-11",
   "kpis": {
     "total_leads": 92,
-    "mql": 30,
-    "sql": 12,
+    "mql": 31,
+    "sql": 13,
     "closed_won": 2,
     "cpl": null,
     "cpa": null
@@ -53,15 +53,15 @@
         "bison_cold": 68,
         "other": 0
       },
-      "mql": 24,
+      "mql": 25,
       "mql_by_source": {
         "gads_lp": 0,
-        "bison_cold": 24,
+        "bison_cold": 25,
         "other": 0
       },
-      "sql": 12,
+      "sql": 13,
       "sql_stage_split": {
-        "proposal_sent": 10,
+        "proposal_sent": 11,
         "negotiating": 0,
         "closed_won": 2
       },
@@ -73,8 +73,8 @@
       },
       "cpl": null,
       "cpl_to_mql": null,
-      "mql_rate": 0.34285714285714286,
-      "sql_rate": 0.5
+      "mql_rate": 0.35714285714285715,
+      "sql_rate": 0.52
     },
     {
       "month": "2026-06",
@@ -119,19 +119,19 @@
     {
       "source": "bison_cold",
       "leads": 90,
-      "mql": 30,
-      "sql": 12,
+      "mql": 31,
+      "sql": 13,
       "closed_won": 2
     }
   ],
   "funnel": {
     "leads": 92,
-    "mql": 30,
-    "sql": 12,
+    "mql": 31,
+    "sql": 13,
     "closed_won": 2
   },
   "sql_stage_split": {
-    "proposal_sent": 10,
+    "proposal_sent": 11,
     "negotiating": 0,
     "closed_won": 2
   },
@@ -562,17 +562,17 @@
   ],
   "stale": false,
   "outreach": {
-    "emails_sent": 17624,
-    "total_leads_contacted": 8550,
-    "replied": 248,
-    "interested": 64,
-    "bounced": 122,
+    "emails_sent": 18376,
+    "total_leads_contacted": 9298,
+    "replied": 254,
+    "interested": 65,
+    "bounced": 131,
     "unsubscribed": 0,
-    "active_campaigns": 2,
-    "campaign_count": 9,
-    "reply_rate": 0.029005847953216375,
-    "positive_reply_rate": 0.25806451612903225,
-    "bounce_rate": 0.006922378574670904,
+    "active_campaigns": 3,
+    "campaign_count": 10,
+    "reply_rate": 0.027317702731770272,
+    "positive_reply_rate": 0.2559055118110236,
+    "bounce_rate": 0.007128863735306922,
     "campaigns": [
       {
         "name": "26.05.26, US",
@@ -606,14 +606,14 @@
         "status": "active",
         "emails_sent": 1985,
         "total_leads_contacted": 733,
-        "replied": 33,
+        "replied": 34,
         "interested": 8,
-        "reply_rate": 0.045020463847203276
+        "reply_rate": 0.04638472032742155
       },
       {
         "name": "28.04.26, US, C-level, health/wealth+",
         "status": "active",
-        "emails_sent": 1663,
+        "emails_sent": 1667,
         "total_leads_contacted": 590,
         "replied": 43,
         "interested": 20,
@@ -636,6 +636,15 @@
         "replied": 13,
         "interested": 1,
         "reply_rate": 0.027253668763102725
+      },
+      {
+        "name": "05.06.26, US",
+        "status": "active",
+        "emails_sent": 748,
+        "total_leads_contacted": 748,
+        "replied": 5,
+        "interested": 1,
+        "reply_rate": 0.0066844919786096255
       },
       {
         "name": "13.05.26, US",
@@ -869,8 +878,8 @@
     {
       "source": "bison_cold",
       "leads": 90,
-      "mql": 30,
-      "sql": 12,
+      "mql": 31,
+      "sql": 13,
       "closed_won": 2,
       "cost": null,
       "cpl": null,
@@ -878,21 +887,21 @@
     }
   ],
   "conversion_rates": {
-    "lead_to_mql": 0.326,
-    "mql_to_sql": 0.4,
-    "sql_to_won": 0.167
+    "lead_to_mql": 0.337,
+    "mql_to_sql": 0.419,
+    "sql_to_won": 0.154
   },
   "total_pipeline": {
-    "total_all_time": 235,
-    "open_active": 178,
+    "total_all_time": 239,
+    "open_active": 182,
     "by_stage_open": [
       {
         "stage": "Call Scheduled",
-        "count": 11
+        "count": 15
       },
       {
         "stage": "Discovery Call Done",
-        "count": 68
+        "count": 67
       },
       {
         "stage": "Follow Up Call Done",
@@ -904,7 +913,7 @@
       },
       {
         "stage": "Proposal Sent",
-        "count": 15
+        "count": 16
       },
       {
         "stage": "Negotiating",
@@ -916,7 +925,7 @@
     "win_rate_period": 0.3,
     "period": {
       "start": "2026-05-11",
-      "end": "2026-06-05"
+      "end": "2026-06-07"
     }
   }
 }
