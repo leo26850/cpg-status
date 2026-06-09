@@ -32,10 +32,18 @@ async function truncateLoad(
   rows: Record<string, unknown>[],
   schema: Field[],
 ): Promise<void> {
-  // WRITE_TRUNCATE creates-or-replaces the table atomically and is immediately
-  // queryable (unlike streaming inserts). Skips on empty input to avoid clobbering
-  // an existing table with nothing when a section (e.g. outreach) is unavailable.
+  // These are wholesale-refresh reporting tables. WRITE_TRUNCATE replaces rows
+  // but NOT the schema of an existing table, so a new/changed column would be
+  // rejected ("No such field"). Drop first so the load recreates the table with
+  // the current schema every run — keeps the sink resilient to schema evolution.
+  // Skips on empty input to avoid clobbering a table with nothing when a section
+  // (e.g. outreach) is unavailable this run.
   if (rows.length === 0) return;
+  try {
+    await bq.dataset(DATASET).table(table).delete();
+  } catch {
+    // table didn't exist yet — fine, the load below creates it
+  }
   const ndjson = rows.map((r) => JSON.stringify(r)).join('\n');
   await new Promise<void>((res, rej) => {
     const stream = bq
@@ -142,6 +150,7 @@ export async function sinkReportToBQ(
     monthly.map((m) => ({
       snapshot_date: snapshotDate,
       month: m.month,
+      month_start: m.month ? `${m.month}-01` : null, // DATE for Looker's date axis/range control
       total_leads: m.total_leads,
       leads_gads_lp: m.leads_by_source?.gads_lp ?? 0,
       leads_bison_cold: m.leads_by_source?.bison_cold ?? 0,
@@ -155,6 +164,7 @@ export async function sinkReportToBQ(
     [
       { name: 'snapshot_date', type: 'DATE', mode: 'REQUIRED' },
       { name: 'month', type: 'STRING' },
+      { name: 'month_start', type: 'DATE' },
       { name: 'total_leads', type: 'INTEGER' },
       { name: 'leads_gads_lp', type: 'INTEGER' },
       { name: 'leads_bison_cold', type: 'INTEGER' },
