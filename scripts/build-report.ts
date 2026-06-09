@@ -362,6 +362,17 @@ async function main(): Promise<void> {
   const monthSnap = `data/${today.slice(0, 7)}.json`;
   writeFileSync(monthSnap, JSON.stringify(report, null, 2));
 
+  // Sink the computed report into BigQuery (cpg_marts.*) for Looker Studio.
+  // Same numbers the HTML report shows — no new Attio sync, no re-implemented
+  // stage logic. Resilient: a BQ failure must NOT break the HTML report build.
+  try {
+    const { sinkReportToBQ } = await import('./sink-to-bq.js');
+    await sinkReportToBQ(bq, report, today);
+    console.log('Sunk report to cpg_marts.* for Looker');
+  } catch (err) {
+    console.warn('[bq-sink] failed — Looker tables not refreshed this run:', String((err as Error)?.message ?? err));
+  }
+
   // Render HTML
   const { renderHtml } = await import('./render/html.js');
   const html = renderHtml(report);
