@@ -1,6 +1,6 @@
 # CPG Affiliate · 2026-06 · Lead Funnel
 
-_Generated 2026-06-14T09:21:43.780Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
+_Generated 2026-06-21T09:39:26.969Z · Per [KAMG Lead Funnel Metrics SOP v2](https://app.plane.so/project-ares/projects/a2afea6c-b46c-4641-bc25-d3449bab96da/pages/4f189e5d-4d22-4ac5-906e-c83a0139b8ba)_
 
 ## Block 1 · Header strip
 
@@ -8,7 +8,7 @@ _Generated 2026-06-14T09:21:43.780Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 |---|---|
 | Client | CPG Affiliate |
 | Month | 2026-06 |
-| Window | 2026-05-11 → 2026-06-14 |
+| Window | 2026-05-11 → 2026-06-21 |
 | Launch date | 2026-05-11 |
 | Target CPL | — |
 | Target CPA | — |
@@ -19,42 +19,42 @@ _Generated 2026-06-14T09:21:43.780Z · Per [KAMG Lead Funnel Metrics SOP v2](htt
 | Metric | Value |
 |---|---|
 | Total spend (fully-loaded) | $0 |
-| Leads (deduped) | 13 |
+| Leads (deduped) | 26 |
 | CPL | — |
 
 ## Block 3 · Inbound leads by source
 
 | Source | Count |
 |---|---|
-| gads_lp | 1 |
-| bison_cold | 12 |
+| gads_lp | 4 |
+| bison_cold | 22 |
 | Other | 0 |
-| **Total** | **13** |
+| **Total** | **26** |
 
 ## Block 4 · MQL total
 
 | Metric | Value |
 |---|---|
-| MQL (Booked Call stage) | 4 |
-| MQL rate | 30.8% |
+| MQL (Booked Call stage) | 9 |
+| MQL rate | 34.6% |
 | CPL → MQL | — |
 
 ## Block 5 · MQL by source
 
 | Source | MQL count |
 |---|---|
-| gads_lp | 1 |
-| bison_cold | 3 |
+| gads_lp | 4 |
+| bison_cold | 5 |
 
 ## Block 6 · SQL total + stage split
 
 | Metric | Value |
 |---|---|
-| SQL total (Proposal Sent + Negotiating + Closed Won) | 1 |
-| Proposal Sent | 1 |
+| SQL total (Proposal Sent + Negotiating + Closed Won) | 3 |
+| Proposal Sent | 3 |
 | Negotiating | 0 |
 | Closed Won | 0 |
-| SQL rate (vs MQL) | 25.0% |
+| SQL rate (vs MQL) | 33.3% |
 
 _SQL rejection reason codes not tracked at CPG — see metrics-rubric.md._
 
